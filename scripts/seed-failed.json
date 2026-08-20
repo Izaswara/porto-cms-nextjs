@@ -1,0 +1,18 @@
+[
+  {
+    "table": "users",
+    "rows": [
+      {
+        "id": 1,
+        "name": "Faiz Indriaswara",
+        "username": "faizindriaswara",
+        "email": "owner@example.com",
+        "email_verified_at": null,
+        "password": "$2y$12$x5lH/agVdczn.Kx0Kj5VcOC7h6qcCCW2mNlBwJcTvQJ7F6.6ZDsXy",
+        "remember_token": null,
+        "created_at": "2026-08-04 21:28:14",
+        "updated_at": "2026-08-06 21:48:10"
+      }
+    ]
+  }
+]

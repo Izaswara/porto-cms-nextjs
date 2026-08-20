@@ -1,0 +1,29 @@
+/* Admin / owner dashboard styles */
+
+:root {
+  --owner-bg: #020617;
+}
+
+body {
+  background: var(--owner-bg);
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.3);
+}
+
+/* scrollbar tipis untuk sidebar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
