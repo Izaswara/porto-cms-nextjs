@@ -30,7 +30,7 @@ export default function MusicBar() {
 
   return (
     <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[60]">
-      <div className="glass-card rounded-full pl-3 pr-4 py-2.5 flex items-center gap-3 shadow-xl shadow-black/40">
+      <div className="glass-card rounded-full pl-3 pr-4 py-2.5 flex items-center gap-3 shadow-xl shadow-black/40 music-bar-float">
         <button
           onClick={toggleBgm}
           aria-label={playing ? 'Jeda musik' : 'Putar musik'}

@@ -48,8 +48,8 @@ export default function Hud() {
   const [time, setTime] = useState('00:00:00');
   const [date, setDate] = useState('');
   const [uptime, setUptime] = useState('00:00:00');
-  const [scrollY, setScrollY] = useState('0000');
   const [weather, setWeather] = useState<Weather | null>(null);
+  const scrollYRef = useRef<HTMLSpanElement>(null);
   const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
   const cancelledRef = useRef(false);
 
@@ -73,7 +73,9 @@ export default function Hud() {
     tick();
     const interval = setInterval(tick, 1000);
 
-    const onScroll = () => setScrollY(String(Math.round(window.scrollY)).padStart(4, '0'));
+    const onScroll = () => {
+      if (scrollYRef.current) scrollYRef.current.textContent = String(Math.round(window.scrollY)).padStart(4, '0');
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
 
@@ -161,7 +163,7 @@ export default function Hud() {
       <span className="hud-time">{time}</span>
       <span className="hud-sub">{date}</span>
       <span className="hud-row">UPTIME {uptime}</span>
-      <span className="hud-row">Y:{scrollY}</span>
+      <span className="hud-row">Y:<span ref={scrollYRef}>0000</span></span>
     </div>
   );
 }

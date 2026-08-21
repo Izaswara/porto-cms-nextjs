@@ -17,6 +17,24 @@ export default function SiteFx() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Smooth scroll untuk anchor links (CSS scroll-behavior dihapus biar scroll native nggak nyangkut)
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      const a = t.closest('a[href^="#"]') as HTMLAnchorElement | null;
+      if (!a) return;
+      const hash = a.getAttribute('href');
+      if (!hash || hash === '#') return;
+      const el = document.querySelector(hash);
+      if (!el) return;
+      e.preventDefault();
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, []);
+
   const scrollToTop = () => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
@@ -195,6 +213,11 @@ export default function SiteFx() {
         <span className="aa-1" />
         <span className="aa-2" />
         <span className="aa-3" />
+      </div>
+      <div className="shooting-stars" aria-hidden="true">
+        <i className="ss-1" />
+        <i className="ss-2" />
+        <i className="ss-3" />
       </div>
       <div className="ai-site-scan" aria-hidden="true" />
       <div ref={ringRef} className="cursor-ring" />

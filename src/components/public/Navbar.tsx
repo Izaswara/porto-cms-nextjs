@@ -26,28 +26,32 @@ export default function Navbar({ siteName, siteLogo, menus, locale, translations
   const menuOpenRef = useRef(false);
   const closingRef = useRef(false);
   const failSafeRef = useRef(0);
-  const navIdleTimerRef = useRef(0);
 
-  // Auto-hide navbar: hilang saat scroll aktif, muncul lagi pas scroll berhenti
+  // Auto-hide navbar: sembunyi saat scroll ke bawah, muncul lagi saat scroll ke atas
   useEffect(() => {
-    let hidden = false;
+    const navbar = document.getElementById('navbar');
+    if (!navbar) return;
+    const menu = document.getElementById('neural-menu');
+    let lastY = window.scrollY;
+    let ticking = false;
     const onScroll = () => {
-      const y = window.scrollY;
-      if (y > 48 && !hidden) {
-        hidden = true;
-        setNavHidden(true);
-      }
-      clearTimeout(navIdleTimerRef.current);
-      navIdleTimerRef.current = window.setTimeout(() => {
-        hidden = false;
-        setNavHidden(false);
-      }, 200);
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const y = window.scrollY;
+        const menuOpen = menu?.classList.contains('open') ?? false;
+        const scrollingDown = y > lastY + 6;
+        const scrollingUp = y < lastY - 6;
+        if (scrollingDown && y > 140 && !menuOpen) setNavHidden(true);
+        else if (scrollingUp || y <= 140) setNavHidden(false);
+        navbar.classList.toggle('nav-scrolled', y > 24);
+        lastY = y;
+      });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      clearTimeout(navIdleTimerRef.current);
-    };
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {

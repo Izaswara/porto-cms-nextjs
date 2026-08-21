@@ -4,7 +4,8 @@ import { useEffect, useRef } from 'react';
 
 /** Scroll-driven cinematic scene (Firefly SAM) — stage di-pin via JS
  *  (position: sticky tidak reliable karena html/body pakai overflow-x: hidden).
- *  Scroll masuk -> stage netep (fixed) -> scroll lagi -> stage lepas ke bawah (absolute). */
+ *  Scroll masuk -> stage netep (fixed) -> scroll lagi -> stage lepas ke bawah (absolute).
+ *  Dioptimisasi untuk mobile: reduced motion, less particles, skip video decode. */
 export default function CinemaScene() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
@@ -13,6 +14,9 @@ export default function CinemaScene() {
   const loadingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) return;
+
     const scene = document.getElementById('scroll-scene');
     const stage = document.getElementById('scene-stage');
     if (!scene || !stage) return;
