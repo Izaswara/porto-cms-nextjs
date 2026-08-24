@@ -85,6 +85,17 @@ export const RESOURCE_CONFIGS: Record<string, ResourceConfig> = {
     dateFields: ['issue_date', 'expiry_date'],
     activityName: (action, d) => (action === 'create' ? `Sertifikat ditambahkan: ${d.title}` : `Sertifikat diperbarui: ${d.title}`),
   },
+  showcase: {
+    table: 'showcase',
+    label: 'showcase',
+    requiredFields: [],
+    jsonFields: [],
+    boolFields: ['is_active'],
+    intFields: ['sort_order'],
+    floatFields: [],
+    dateFields: [],
+    activityName: (action, d) => (action === 'create' ? `Showcase ditambahkan: ${d.title ?? 'tanpa judul'}` : `Showcase diperbarui: ${d.title ?? 'tanpa judul'}`),
+  },
   galleries: {
     table: 'galleries',
     label: 'album',

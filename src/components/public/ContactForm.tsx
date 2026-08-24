@@ -32,16 +32,16 @@ export default function ContactForm() {
   }
 
   const inputCls =
-    'w-full px-4 py-3 rounded-xl text-sm outline-none transition-all glass-card';
+    'w-full px-4 py-3 text-sm outline-none transition-all glass-card';
   const labelCls = 'block text-xs uppercase tracking-wider mb-1.5';
   const labelStyle = { color: 'var(--app-muted)' };
   const textStyle = { color: 'var(--app-text)' };
 
   if (status === 'ok') {
     return (
-      <div className="glass-card rounded-2xl p-8 text-center">
+      <div className="glass-card  p-8 text-center">
         <div className="text-4xl mb-3">✅</div>
-        <h3 className="font-[Space_Grotesk] font-bold text-lg" style={textStyle}>
+        <h3 className="font-display font-bold text-lg" style={textStyle}>
           Pesan terkirim!
         </h3>
         <p className="text-sm mt-2" style={labelStyle}>
@@ -49,8 +49,8 @@ export default function ContactForm() {
         </p>
         <button
           onClick={() => setStatus('idle')}
-          className="mt-5 px-5 py-2 rounded-xl text-sm font-medium text-white transition-all hover:opacity-90 cursor-pointer"
-          style={{ background: 'linear-gradient(135deg, var(--p-primary), var(--p-secondary))' }}
+          className="btn-solid mt-5 px-6 py-2.5 text-sm font-semibold transition-all hover:opacity-85 cursor-pointer"
+          
         >
           Kirim pesan lain
         </button>
@@ -59,8 +59,8 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={submit} className="glass-card rounded-2xl p-6 sm:p-8 text-left max-w-xl mx-auto">
-      {error && <p className="text-sm text-rose-400 mb-4 bg-rose-500/10 rounded-lg px-4 py-2.5">{error}</p>}
+    <form onSubmit={submit} className="glass-card  p-6 sm:p-8 text-left max-w-xl mx-auto">
+      {error && <p className="text-sm text-rose-400 mb-4 bg-rose-500/10 px-4 py-2.5">{error}</p>}
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls} style={labelStyle}>Nama</label>
@@ -116,8 +116,8 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={busy}
-        className="mt-6 w-full sm:w-auto px-8 py-3 rounded-xl text-sm font-medium text-white transition-all hover:opacity-90 disabled:opacity-50 cursor-pointer shine"
-        style={{ background: 'linear-gradient(135deg, var(--p-primary), var(--p-secondary))' }}
+        className="btn-solid mt-6 w-full sm:w-auto px-8 py-3 text-sm font-semibold transition-all hover:opacity-85 disabled:opacity-50 cursor-pointer shine"
+        
       >
         {busy ? 'Mengirim...' : 'Kirim Pesan'}
       </button>

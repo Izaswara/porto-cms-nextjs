@@ -1,8 +1,17 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { db } from '@/lib/db';
 import { mediaUrl } from '@/lib/db';
 
-export const metadata: Metadata = { title: 'Gallery' };
+export const metadata: Metadata = {
+  title: 'Gallery',
+  description: 'Dokumentasi foto kegiatan, pekerjaan, dan pengalaman.',
+  alternates: { canonical: '/gallery' },
+  openGraph: { title: 'Gallery', url: '/gallery' },
+};
+
+/* Konten gallery jarang berubah — prerender + revalidate tiap 60 detik */
+export const revalidate = 60;
 
 export default async function GalleryPage() {
   const { data: galleries } = await db()
@@ -15,9 +24,10 @@ export default async function GalleryPage() {
   const active = galleries ?? [];
 
   return (
-    <div className="pt-28 pb-20 min-h-screen">
+    <div className="pt-28 pb-20 min-h-screen" data-book>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <h1 className="font-[Space_Grotesk] text-4xl font-bold text-white mb-2">
+        <p className="aw-eyebrow mb-4"><span className="aw-num">/</span> <span className="aw-kanji">写真</span> Moments</p>
+        <h1 className="section-heading text-white mb-2 text-balance">
           Photo <span className="text-gradient">Gallery</span>
         </h1>
         <p className="text-slate-500 mb-10">Dokumentasi pekerjaan & pengalaman saya.</p>
@@ -28,25 +38,23 @@ export default async function GalleryPage() {
               const cover = mediaUrl((gallery.cover_image as string | null) || images[0] || null);
               return (
                 <a key={gallery.id} href={`/gallery/${gallery.slug}`} className="group">
-                  <div className="glass-card rounded-xl overflow-hidden hover:-translate-y-1 transition-all">
+                  <div className="plate-card overflow-hidden hover:-translate-y-1 transition-all">
                     <div className="relative aspect-video overflow-hidden">
                       {cover ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={cover} alt={gallery.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        <Image src={cover} alt={gallery.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover grayscale contrast-[1.05] group-hover:grayscale-0 group-hover:scale-105 transition-[filter,transform] duration-700" />
                       ) : (
                         <div className="w-full h-full bg-white/[.03] flex items-center justify-center text-4xl">🖼️</div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
                         <div>
                           {gallery.category && (
-                            <p className="text-[10px] uppercase tracking-wider text-cyan-400 mb-1">{gallery.category}</p>
+                            <p className="font-mono-accent text-[10px] uppercase tracking-wider text-slate-400 mb-1">{gallery.category}</p>
                           )}
-                          <h3 className="font-semibold text-white">{gallery.title}</h3>
-                          <p className="text-[11px] text-slate-300 mt-1">{images.length} foto</p>
+                          <h3 className="font-serif text-xl text-white">{gallery.title}</h3>
                         </div>
                       </div>
-                      <span className="absolute top-3 right-3 glass-card rounded-lg px-2 py-1 text-[10px] text-white">
-                        {images.length} foto
+                      <span className="absolute top-3 right-3 font-mono-accent text-[10px] tracking-[0.2em] px-2 py-1 border border-white/15 bg-black/40 text-white/70">
+                        {images.length} FOTO
                       </span>
                     </div>
                     {gallery.description && (

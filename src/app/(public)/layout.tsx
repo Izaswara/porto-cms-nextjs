@@ -1,74 +1,138 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
-import { db } from '@/lib/db';
 import { isValidLocale, getTranslations } from '@/lib/i18n';
 import { t } from '@/lib/public-data';
 import { mediaUrl } from '@/lib/db';
-import Preloader from '@/components/public/Preloader';
-import SiteFx from '@/components/public/SiteFx';
-import ClickFx from '@/components/public/ClickFx';
+import { getSettings, getMenus, getSocials } from '@/lib/cache';
+import { siteUrl, FALLBACK_SITE_NAME } from '@/lib/site';
 import Navbar from '@/components/public/Navbar';
 import Footer from '@/components/public/Footer';
 import RevealEngine from '@/components/public/RevealEngine';
+import LenisProvider from '@/components/public/LenisProvider';
 import LocaleSync from '@/components/public/LocaleSync';
 import Hud from '@/components/public/Hud';
+import LeftRail from '@/components/public/LeftRail';
+import Preloader from '@/components/public/Preloader';
 import MusicBar from '@/components/public/MusicBar';
-import type { Locale, SocialMediaRow } from '@/lib/types';
+import FixedRail from '@/components/public/FixedRail';
+import EdgeRails from '@/components/public/EdgeRails';
+import CustomCursor from '@/components/public/CustomCursor';
+import ScrollRibbon from '@/components/public/ScrollRibbon';
+import JsonLd from '@/components/public/JsonLd';
+import type { Locale } from '@/lib/types';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { data } = await db().from('settings').select('key, value');
-  const settings: Record<string, string | null> = {};
-  for (const row of data ?? []) settings[row.key] = row.value;
-  const siteName = settings['site_name'] || 'Faiz Dev';
+  const settings = await getSettings();
+  const siteName = settings['site_name'] || FALLBACK_SITE_NAME;
+  const description =
+    settings['site_description'] ||
+    `Portfolio ${siteName} — projects, blog & gallery.`;
+  const favicon = settings['site_favicon'] ? mediaUrl(settings['site_favicon']) ?? undefined : undefined;
+  const ogImage = settings['site_og_image'] ? mediaUrl(settings['site_og_image']) : undefined;
+
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+    metadataBase: new URL(siteUrl()),
     title: { default: siteName, template: `%s — ${siteName}` },
-    description: `Portfolio ${siteName} — projects, blog & gallery.`,
-    icons: settings['site_favicon'] ? { icon: mediaUrl(settings['site_favicon']) ?? undefined } : undefined,
+    description,
+    applicationName: siteName,
+    keywords: ['portfolio', 'developer', 'web developer', 'projects', 'blog', siteName],
+    authors: [{ name: siteName }],
+    creator: siteName,
+    alternates: { canonical: '/' },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+    },
+    openGraph: {
+      type: 'website',
+      locale: 'id_ID',
+      alternateLocale: ['en_US'],
+      url: '/',
+      siteName,
+      title: siteName,
+      description,
+      images: ogImage
+        ? [{ url: ogImage, width: 1200, height: 630, alt: siteName }]
+        : favicon
+          ? [{ url: favicon, alt: siteName }]
+          : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: siteName,
+      description,
+      images: ogImage ? [ogImage] : undefined,
+    },
+    icons: favicon ? { icon: favicon } : { icon: '/favicon.svg' },
   };
 }
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const store = await cookies();
   const locale = isValidLocale(store.get('locale')?.value);
-  const [settingsRes, menusRes, socialsRes, translations] = await Promise.all([
-    db().from('settings').select('key, value'),
-    db().from('menus').select('url, slug, name').eq('is_active', true).eq('is_hidden', false).order('sort_order', { ascending: true }),
-    db().from('social_media').select('*').eq('is_active', true).order('sort_order', { ascending: true }),
+  const [settings, menus, socials, translations] = await Promise.all([
+    getSettings(),
+    getMenus(),
+    getSocials(),
     getTranslations(locale),
   ]);
 
-  const settings: Record<string, string | null> = {};
-  for (const row of settingsRes.data ?? []) settings[row.key] = row.value;
+  const siteName = settings['site_name'] || FALLBACK_SITE_NAME;
+  const siteEmail = settings['site_email'] || '';
+  const base = siteUrl();
 
-  const siteName = settings['site_name'] || 'Faiz Dev';
-  const menus = (menusRes.data ?? []).map((m) => ({ url: m.url ?? '#', slug: m.slug, name: m.name }));
+  // Structured data identitas situs — tampil di semua halaman publik
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: siteName,
+      url: base,
+      inLanguage: locale,
+      description: settings['site_description'] || `Portfolio ${siteName}`,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: siteName,
+      url: base,
+      email: siteEmail || undefined,
+      sameAs: socials.map((s) => s.url).filter(Boolean),
+      jobTitle: settings['site_role'] || undefined,
+    },
+  ];
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: `:root{--p-primary:#ff3333;--p-secondary:#d90429;--p-accent:#ff6b6b;}` }} />
+      <JsonLd data={jsonLd} />
+      {/* Layer warna ambient — kabut triad di belakang seluruh konten */}
+      <div className="aurora-layer" aria-hidden="true">
+        <span className="aurora-blob" />
+      </div>
+      <Preloader />
       <LocaleSync locale={locale as Locale} />
-      <Preloader siteName={siteName} />
-      <SiteFx />
-      <ClickFx />
+      <LenisProvider />
       <RevealEngine />
+      <CustomCursor />
+      <ScrollRibbon />
       <Hud />
+      <LeftRail siteName={siteName} />
       <Navbar
-        siteName={siteName}
-        siteLogo={mediaUrl(settings['site_logo'])}
         menus={menus}
         locale={locale as Locale}
         translations={translations}
-        contactLabel={t(translations, 'home.contact_me', 'Contact Me')}
         cvUrl={settings['cv_url'] || null}
       />
       <main className="relative z-10">{children}</main>
       <Footer
         siteName={siteName}
         siteFooter={settings['site_footer']}
-        socials={(socialsRes.data ?? []) as SocialMediaRow[]}
+        socials={socials}
       />
       <MusicBar />
+      <EdgeRails socials={socials} />
+      <FixedRail siteName={siteName} />
     </>
   );
 }

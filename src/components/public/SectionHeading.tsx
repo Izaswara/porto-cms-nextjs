@@ -1,55 +1,27 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import LiquidTitle from './LiquidTitle';
 
 interface SectionHeadingProps {
   pre: string;
   grad: string;
   desc?: string;
   emoji?: string;
+  index?: string;
+  kanji?: string;
 }
 
-const SCRAMBLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/{}[]#$%&*+=~';
-
-function ScrambleSpan({ text, active, startDelay, className }: { text: string; active: boolean; startDelay: number; className?: string }) {
-  const [display, setDisplay] = useState(() => ' '.repeat(text.length));
-  const [done, setDone] = useState(false);
-
-  useEffect(() => {
-    if (!active || done) return;
-    let elapsed = 0;
-    const interval = setInterval(() => {
-      elapsed += 1;
-      if (elapsed < startDelay) return;
-      const frame = elapsed - startDelay;
-      const revealCount = Math.floor(frame / 2);
-      setDisplay(
-        Array.from(text)
-          .map((ch, i) => {
-            if (i < revealCount || ch === ' ') return ch;
-            return SCRAMBLE[Math.floor(Math.random() * SCRAMBLE.length)];
-          })
-          .join('')
-      );
-      if (revealCount >= text.length) {
-        clearInterval(interval);
-        setDisplay(text);
-        setDone(true);
-      }
-    }, 28);
-    return () => clearInterval(interval);
-  }, [active, text, startDelay, done]);
-
-  return (
-    <span className={className}>
-      {Array.from(display).map((ch, i) => (
-        <span key={i} className="sh-char">{ch}</span>
-      ))}
-    </span>
-  );
-}
-
-export default function SectionHeading({ pre, grad, desc, emoji }: SectionHeadingProps) {
+/**
+ * Judul section gaya Izanami:
+ * - Reveal "mask": tiap segmen judul naik dari dalam wadah terpotong
+ *   (overflow hidden + translateY), berjenjang antar segmen.
+ * - Hairline di bawah judul draw-in (scaleX) setelah teks muncul.
+ * - Teks judul punya efek liquid per huruf yang sama dengan nama di hero
+ *   (LiquidTitle) — huruf tertarik & bergelombang mengikuti kursor.
+ * Dipicu sekali oleh IntersectionObserver saat 35% elemen terlihat.
+ */
+export default function SectionHeading({ pre, grad, desc, emoji, index, kanji }: SectionHeadingProps) {
   const [active, setActive] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -72,15 +44,25 @@ export default function SectionHeading({ pre, grad, desc, emoji }: SectionHeadin
   }, []);
 
   return (
-    <div className="text-center" ref={ref}>
-      <h2 className="section-heading font-[Space_Grotesk] text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
-        {emoji && <span>{emoji} </span>}
-        <ScrambleSpan text={pre} active={active} startDelay={2} />
-        <ScrambleSpan text={grad} active={active} startDelay={2 + pre.length * 2} className="text-gradient" />
-      </h2>
-      {active && <span className="sh-beam" aria-hidden="true" />}
+    <div className={`text-center mask-group ${active ? 'in' : ''}`} ref={ref}>
+      {(index || kanji) && (
+        <p className="aw-eyebrow mb-3 justify-center" aria-hidden="true">
+          {index && <span className="aw-num">{index}</span>}
+          {kanji && <span className="aw-kanji">{kanji}</span>}
+        </p>
+      )}
+      <LiquidTitle
+        pre={pre}
+        grad={grad}
+        emoji={emoji}
+        masked
+        inView={active}
+        className="section-heading text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4 text-balance"
+      />
+      {/* Hairline draw-in — pengganti beam lama */}
+      <span className={`sh-line ${active ? 'in' : ''}`} aria-hidden="true" />
       {desc && (
-        <p className="text-slate-500 text-center mb-10" data-reveal>
+        <p className="text-slate-500 text-center mb-10 mt-6" data-reveal>
           {desc}
         </p>
       )}

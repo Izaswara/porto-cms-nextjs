@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+<!--
+  ════════════════════════════════════════════════════════════════════
+  PORTFOLIO — DARK ELEGANT (standalone prototype)
+  ────────────────────────────────────────────────────────────────────
+  • Tailwind CSS via CDN + JavaScript murni (tanpa framework)
+  • Struktur konten 100% mengikuti web porto: About, Skills, Projects,
+    Experience, Blog, Gallery, Contact — BUKAN halaman Izanami.
+  • Palet diambil dari foto profil: warm-black #0d0906, bone #e8ddd0,
+    copper #d07845.
+  • Cara pakai : buka langsung di browser (double-click file ini).
+  • Catatan    : konten bertanda [GANTI] perlu disinkronkan dengan
+                 data Supabase milikmu.
+  ════════════════════════════════════════════════════════════════════
+-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faiz Dev — Portfolio</title>
+  <meta name="description" content="Portfolio Faiz Indriaswara — projects, blog & gallery." />
+
+  <!-- ── Tailwind CDN ─────────────────────────────────────────────── -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ── Konfigurasi tema Tailwind (palet + font) ─────────────────── -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink:    '#0d0906',   // latar warm-black (dari foto profil)
+            ink2:   '#130d08',   // permukaan kartu
+            bone:   '#e8ddd0',   // teks utama hangat
+            mute:   '#a08e7e',   // teks sekunder
+            copper: '#d07845',   // aksen (dari rona foto)
+            line:   'rgba(232,221,208,0.16)', // hairline 16%
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],   // judul
+            label: ['Cinzel', 'Georgia', 'serif'],               // label/eyebrow
+            sans:  ['Inter', 'system-ui', 'sans-serif'],         // teks biasa
+            jp:    ['"Shippori Mincho"', 'serif'],               // aksen kanji
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- ── Google Fonts ─────────────────────────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500;600&family=Shippori+Mincho:wght@500&display=swap" rel="stylesheet" />
+
+  <!-- ── CSS kustom (efek yang tidak ada di Tailwind) ─────────────── -->
+  <style>
+    /* Grain film halus di atas segalanya — tekstur premium */
+    body::after {
+      content: ""; position: fixed; inset: 0; z-index: 90;
+      pointer-events: none; opacity: .05;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Scrollbar tipis senada */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0d0906; }
+    ::-webkit-scrollbar-thumb { background: rgba(232,221,208,.22); }
+    ::selection { background: #e8ddd0; color: #0d0906; }
+
+    /* Label vertikal di sisi kiri layar (desktop saja) */
+    .vertical-label {
+      writing-mode: vertical-rl;
+      font-family: Cinzel, serif; font-size: .6rem;
+      letter-spacing: .42em; text-transform: uppercase; color: #a08e7e;
+    }
+    @media (min-width: 1280px) { .vertical-label { display: block; } }
+
+    /* Reveal on scroll: status awal + status masuk */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(.22,.61,.36,1), transform .9s cubic-bezier(.22,.61,.36,1); }
+    .reveal.in-view { opacity: 1; transform: none; }
+
+    /* Ken Burns super pelan untuk latar hero */
+    .kenburns { animation: kb 26s ease-in-out infinite alternate; }
+    @keyframes kb { from { transform: scale(1); } to { transform: scale(1.08) translate(-1.5%, -1%); } }
+
+    /* Panel kaca (glassmorphism) + kilau bergerak */
+    .glass {
+      background: linear-gradient(120deg, rgba(232,221,208,.06), rgba(232,221,208,.02));
+      border: 1px solid rgba(232,221,208,.16);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      position: relative; overflow: hidden;
+    }
+    .glass::before { /* kilau diagonal yang bergerak sangat pelan */
+      content: ""; position: absolute; inset: -60%;
+      background: linear-gradient(115deg, transparent 42%, rgba(232,221,208,.07) 50%, transparent 58%);
+      animation: sheen 9s ease-in-out infinite;
+    }
+    @keyframes sheen { 0%,100% { transform: translateX(-30%); } 50% { transform: translateX(30%); } }
+
+    /* Indeks proyek: baris bernomor + thumbnail muncul saat hover */
+    .index-row {
+      display: grid; grid-template-columns: auto 1fr auto; align-items: baseline;
+      gap: clamp(1rem, 3vw, 2.5rem);
+      padding: clamp(1.4rem, 2.6vw, 2.2rem) 0;
+      border-top: 1px solid rgba(232,221,208,.16);
+      transition: padding-left .45s cubic-bezier(.22,.61,.36,1);
+    }
+    .index-group .index-row:last-child { border-bottom: 1px solid rgba(232,221,208,.16); }
+    .index-row:hover { padding-left: clamp(.5rem, 1.5vw, 1.5rem); }
+    .index-thumb {
+      pointer-events: none; position: absolute; right: clamp(4rem, 12vw, 14rem); top: 50%;
+      width: clamp(150px, 16vw, 230px); aspect-ratio: 3/4; transform: translateY(-50%) scale(.92) rotate(3deg);
+      opacity: 0; transition: opacity .4s ease, transform .4s cubic-bezier(.22,.61,.36,1);
+      outline: 1px solid rgba(232,221,208,.2); box-shadow: 0 30px 60px -20px rgba(0,0,0,.8); z-index: 5;
+    }
+    .index-row:hover .index-thumb { opacity: 1; transform: translateY(-50%) scale(1) rotate(0deg); }
+    @media (hover: none) { .index-thumb { display: none; } }
+
+    /* Scroll cue: garis yang menetes berulang */
+    .scroll-cue::after {
+      content: ""; display: block; width: 1px; height: 2.4rem; margin-top: .6rem;
+      background: linear-gradient(180deg, #d07845, transparent);
+      animation: drop 2.2s cubic-bezier(.22,.61,.36,1) infinite;
+    }
+    @keyframes drop { 0% {transform: scaleY(0); transform-origin: top;} 45% {transform: scaleY(1); transform-origin: top;} 55% {transform: scaleY(1); transform-origin: bottom;} 100% {transform: scaleY(0); transform-origin: bottom;} }
+
+    /* Overlay menu fullscreen: link muncul berjenjang saat .open */
+    #menu .menu-link { opacity: 0; transform: translateY(26px); transition: opacity .5s ease, transform .6s cubic-bezier(.22,.61,.36,1); }
+    #menu.open .menu-link { opacity: 1; transform: none; }
+    #menu { visibility: hidden; opacity: 0; transition: opacity .45s ease, visibility 0s linear .45s; }
+    #menu.open { visibility: visible; opacity: 1; transition: opacity .45s ease; }
+
+    /* Garis hover tautan (wipe underline) */
+    .link-line { position: relative; }
+    .link-line::after { content: ""; position: absolute; left: 0; bottom: -3px; width: 100%; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .35s cubic-bezier(.22,.61,.36,1); }
+    .link-line:hover::after { transform: scaleX(1); transform-origin: left; }
+
+    /* Hormati preferensi pengguna: matikan semua animasi */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+
+<body class="bg-ink text-bone font-sans font-light antialiased overflow-x-hidden">
+
+  <!-- ══════════════════════════════════════════════════════════════
+       HEADER — monogram kiri-atas + label vertikal; kanan-atas
+       toggle bahasa ID|EN dan tombol MENU (buka overlay fullscreen)
+       ══════════════════════════════════════════════════════════════ -->
+  <header id="site-header" class="fixed inset-x-0 top-0 z-50 transition-[background,border] duration-500 border-b border-transparent">
+    <nav class="flex items-center justify-between px-5 sm:px-[5vw] h-16">
+
+      <!-- Kiri: monogram + label vertikal "PROJECTS" -->
+      <div class="flex items-center gap-6">
+        <a href="#home" class="flex items-center gap-3 group">
+          <span class="relative grid place-items-center w-10 h-10 border border-line transition-colors duration-500 group-hover:border-bone/50">
+            <span class="font-serif italic text-xl leading-none transition-all duration-500 group-hover:text-copper group-hover:scale-110">F</span>
+            <span class="absolute -right-1 -bottom-1 w-1.5 h-1.5 rounded-full bg-copper transition-transform duration-500 group-hover:scale-125"></span>
+          </span>
+          <span class="hidden sm:flex flex-col leading-none">
+            <span class="font-serif text-xl tracking-wide">Faiz Dev</span>
+            <span class="font-label text-[8px] uppercase tracking-[0.45em] text-mute mt-1.5">Portfolio</span>
+          </span>
+        </a>
+        <span class="vertical-label hidden xl:block">Projects — 2026</span>
+      </div>
+
+      <!-- Kanan: bahasa + MENU -->
+      <div class="flex items-center gap-4 sm:gap-6">
+        <!-- Toggle bahasa ID | EN (JavaScript murni, lihat modul i18n) -->
+        <div class="flex items-center gap-2 font-label text-[11px] tracking-[0.25em]">
+          <button data-lang="id" class="lang-btn text-bone transition-opacity">ID</button>
+          <span class="text-line">|</span>
+          <button data-lang="en" class="lang-btn text-mute transition-opacity">EN</button>
+        </div>
+        <!-- Trigger MENU: teks + lingkaran ganda -->
+        <button id="menu-btn" aria-expanded="false" aria-controls="menu"
+                class="group flex items-center gap-3 py-2">
+          <span class="hidden sm:inline font-label text-[11px] uppercase tracking-[0.35em]" data-i18n="menu">Menu</span>
+          <span class="relative grid place-items-center w-9 h-9">
+            <span class="absolute inset-0 rounded-full border border-line"></span>
+            <span class="absolute inset-[7px] rounded-full border border-copper/40 transition-transform duration-500 group-hover:scale-125"></span>
+            <span class="burger-line absolute w-4 h-px bg-bone -mt-1 transition-all duration-300"></span>
+            <span class="burger-line absolute w-4 h-px bg-bone mt-1 transition-all duration-300"></span>
+          </span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       MENU OVERLAY FULLSCREEN
+       Tautan mengikuti halaman web porto: Home, About, Projects,
+       Experience, Blog, Gallery, Contact + email & jam Jakarta.
+       ══════════════════════════════════════════════════════════════ -->
+  <div id="menu" class="fixed inset-0 z-[60] bg-ink/[.98] flex flex-col items-center justify-center gap-8 px-6" aria-hidden="true">
+    <nav class="flex flex-col items-center gap-2 w-full max-w-3xl">
+      <!-- Setiap link diberi --i untuk delay stagger via JS -->
+      <a href="#home"      class="menu-link group w-full flex items-baseline gap-6 py-3 border-b border-line" style="--i:0">
+        <span class="font-label text-xs text-copper">01</span>
+        <span class="font-serif text-3xl md:text-5xl group-hover:italic group-hover:text-copper transition-colors" data-i18n="nav.home">Home</span>
+      </a>
+      <a href="#about"     class="menu-link group w-full flex items-baseline gap-6 py-3 border-b border-line" style="--i:1">
+        <span class="font-label text-xs text-copper">02</span>
+        <span class="font-serif text-3xl md:text-5xl group-hover:italic group-hover:text-copper transition-colors" data-i18n="nav.about">About</span>
+      </a>
+      <a href="#projects"  class="menu-link group w-full flex items-baseline gap-6 py-3 border-b border-line" style="--i:2">
+        <span class="font-label text-xs text-copper">03</span>
+        <span class="font-serif text-3xl md:text-5xl group-hover:italic group-hover:text-copper transition-colors" data-i18n="nav.projects">Projects</span>
+        <!-- Sub-kategori versi porto (bukan School/Craft/Retreat) -->
+        <span class="ml-auto hidden md:flex gap-4 font-label text-[10px] uppercase tracking-[0.25em] text-mute">
+          <span data-i18n="nav.featured">Featured</span><span>·</span><span data-i18n="nav.all">All</span>
+        </span>
+      </a>
+      <a href="#experience" class="menu-link group w-full flex items-baseline gap-6 py-3 border-b border-line" style="--i:3">
+        <span class="font-label text-xs text-copper">04</span>
+        <span class="font-serif text-3xl md:text-5xl group-hover:italic group-hover:text-copper transition-colors" data-i18n="nav.experience">Experience</span>
+      </a>
+      <a href="#blog"      class="menu-link group w-full flex items-baseline gap-6 py-3 border-b border-line" style="--i:4">
+        <span class="font-label text-xs text-copper">05</span>
+        <span class="font-serif text-3xl md:text-5xl group-hover:italic group-hover:text-copper transition-colors" data-i18n="nav.blog">Blog</span>
+      </a>
+      <a href="#gallery"   class="menu-link group w-full flex items-baseline gap-6 py-3 border-b border-line" style="--i:5">
+        <span class="font-label text-xs text-copper">06</span>
+        <span class="font-serif text-3xl md:text-5xl group-hover:italic group-hover:text-copper transition-colors" data-i18n="nav.gallery">Gallery</span>
+      </a>
+      <a href="#contact"   class="menu-link group w-full flex items-baseline gap-6 py-3 border-b border-line" style="--i:6">
+        <span class="font-label text-xs text-copper">07</span>
+        <span class="font-serif text-3xl md:text-5xl group-hover:italic group-hover:text-copper transition-colors" data-i18n="nav.contact">Contact</span>
+      </a>
+    </nav>
+
+    <!-- Kaki menu: email + jam Jakarta (pengganti lokasi Dubai/Tokyo) -->
+    <div class="menu-link flex flex-col sm:flex-row items-center gap-3 sm:gap-8 font-label text-[10px] uppercase tracking-[0.3em] text-mute" style="--i:7">
+      <a href="mailto:hello@faizdev.example" class="link-line hover:text-bone transition-colors">hello@faizdev.example</a>
+      <span class="hidden sm:inline text-line">—</span>
+      <span>Jakarta&nbsp;·&nbsp;<span id="menu-clock">--:--:--</span>&nbsp;WIB</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       HERO — foto porto sebagai latar full-bleed (redup), panel kaca,
+       judul tengah-kiri, sub-judul kanji, tagline, © kiri & scroll kanan
+       ══════════════════════════════════════════════════════════════ -->
+  <section id="home" class="relative min-h-[100svh] flex flex-col justify-end overflow-hidden">
+
+    <!-- Latar: foto profil (ken burns pelan) + dua lapis scrim -->
+    <div class="absolute inset-0" aria-hidden="true">
+      <!-- [GANTI] URL foto hero — sinkron dengan Supabase `hero_sections.photo` -->
+      <img src="https://picsum.photos/seed/faiz-hero/1920/1280?grayscale" alt=""
+           class="kenburns w-full h-full object-cover object-center opacity-70" />
+      <div class="absolute inset-0" style="background:linear-gradient(90deg, rgba(13,9,6,.94) 0%, rgba(13,9,6,.6) 45%, rgba(13,9,6,.15) 100%)"></div>
+      <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(13,9,6,.55) 0%, transparent 35%, rgba(13,9,6,.5) 75%, #0d0906 100%)"></div>
+    </div>
+
+    <!-- Panel kaca + teks tengah-kiri -->
+    <div class="relative z-10 px-5 sm:px-[7vw] pb-24 pt-36">
+      <div class="glass max-w-2xl p-8 sm:p-12 reveal">
+        <p class="font-label text-[11px] uppercase tracking-[0.4em] text-mute mb-6">
+          <span class="text-copper">01</span>&nbsp;&nbsp;<span class="font-jp text-copper">私</span>&nbsp;&nbsp;<span data-i18n="hero.kicker">Portfolio</span>
+        </p>
+        <h1 class="font-serif text-5xl sm:text-6xl lg:text-7xl leading-[1.05]">
+          <span data-i18n="hero.hi">Hi, I'm</span>
+          <em class="italic text-copper">Faiz</em>
+        </h1>
+        <!-- Sub-judul kanji ala Izanami, tapi milik porto: ポートフォリオ -->
+        <p class="font-jp text-copper/90 text-lg mt-4 tracking-[0.3em]">ポートフォリオ</p>
+        <p class="mt-5 text-mute leading-loose max-w-lg" data-i18n="hero.tagline">
+          We craft elegant, high-performance web experiences rooted in clean design.
+        </p>
+      </div>
+    </div>
+
+    <!-- Kiri-bawah: © year · Kanan-bawah: scroll indicator -->
+    <div class="relative z-10 flex items-end justify-between px-5 sm:px-[5vw] pb-8 font-label text-[10px] uppercase tracking-[0.3em] text-mute">
+      <span>© 2026 Faiz Dev</span>
+      <span class="scroll-cue text-right" data-i18n="hero.scroll">Scroll</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ABOUT — pernyataan besar + statistik (isi versi porto)
+       ══════════════════════════════════════════════════════════════ -->
+  <section id="about" class="px-5 sm:px-[7vw] py-28 sm:py-36">
+    <p class="font-label text-[11px] uppercase tracking-[0.4em] text-mute mb-10 reveal">
+      <span class="text-copper">02</span>&nbsp;&nbsp;<span class="font-jp text-copper">私</span>&nbsp;&nbsp;<span data-i18n="sec.about">About</span>
+    </p>
+    <div class="grid lg:grid-cols-[1.4fr_1fr] gap-16 items-start">
+      <h2 class="font-serif text-3xl sm:text-5xl leading-snug reveal" data-i18n="about.statement">
+        Saya membangun produk digital yang cepat, elegan, dan berkesan — dari antarmuka hingga arsitektur datanya.
+      </h2>
+      <div class="space-y-8 reveal">
+        <p class="text-mute leading-loose" data-i18n="about.body">
+          Fullstack developer dengan fokus pada Next.js, TypeScript, dan Supabase.
+          Saya percaya performa dan estetika berdua sama pentingnya.
+        </p>
+        <!-- Statistik [GANTI: sinkron `about_sections.statistics`] -->
+        <div class="grid grid-cols-3 gap-6 border-t border-line pt-8">
+          <div><p class="font-serif text-4xl">3+</p><p class="font-label text-[10px] uppercase tracking-[0.25em] text-mute mt-2" data-i18n="stat.years">Years</p></div>
+          <div><p class="font-serif text-4xl">20+</p><p class="font-label text-[10px] uppercase tracking-[0.25em] text-mute mt-2" data-i18n="stat.projects">Projects</p></div>
+          <div><p class="font-serif text-4xl">15+</p><p class="font-label text-[10px] uppercase tracking-[0.25em] text-mute mt-2" data-i18n="stat.clients">Clients</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SKILLS — chips kategori (pengganti Capabilities versi Izanami)
+       ══════════════════════════════════════════════════════════════ -->
+  <section id="skills" class="px-5 sm:px-[7vw] py-24 border-t border-line">
+    <p class="font-label text-[11px] uppercase tracking-[0.4em] text-mute mb-12 reveal">
+      <span class="text-copper">03</span>&nbsp;&nbsp;<span class="font-jp text-copper">技</span>&nbsp;&nbsp;<span data-i18n="sec.skills">Skills & Tools</span>
+    </p>
+    <!-- [GANTI] daftar skill — sinkron tabel `skills` -->
+    <div class="flex flex-wrap gap-3 reveal">
+      <span class="glass px-5 py-2.5 text-sm">Next.js</span>
+      <span class="glass px-5 py-2.5 text-sm">React</span>
+      <span class="glass px-5 py-2.5 text-sm">TypeScript</span>
+      <span class="glass px-5 py-2.5 text-sm">Node.js</span>
+      <span class="glass px-5 py-2.5 text-sm">Tailwind CSS</span>
+      <span class="glass px-5 py-2.5 text-sm">Supabase</span>
+      <span class="glass px-5 py-2.5 text-sm">PostgreSQL</span>
+      <span class="glass px-5 py-2.5 text-sm">Figma</span>
+      <span class="glass px-5 py-2.5 text-sm">Git</span>
+      <span class="glass px-5 py-2.5 text-sm">Vercel</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       PROJECTS — baris indeks bernomor + thumbnail hover reveal
+       ══════════════════════════════════════════════════════════════ -->
+  <section id="projects" class="py-24 border-t border-line">
+    <div class="px-5 sm:px-[7vw] flex items-end justify-between gap-6 mb-12">
+      <p class="font-label text-[11px] uppercase tracking-[0.4em] text-mute reveal">
+        <span class="text-copper">04</span>&nbsp;&nbsp;<span class="font-jp text-copper">作品</span>&nbsp;&nbsp;<span data-i18n="sec.projects">Selected Work</span>
+      </p>
+      <a href="#" class="link-line font-label text-[11px] uppercase tracking-[0.25em] text-mute hover:text-bone transition-colors reveal" data-i18n="cta.viewall">View all →</a>
+    </div>
+
+    <!-- [GANTI] 6 proyek — sinkron tabel `projects` (featured) -->
+    <div class="index-group relative reveal">
+      <a href="#" class="index-row px-5 sm:px-[5vw] group">
+        <span class="font-label text-xs text-copper">01</span>
+        <span><span class="block font-serif text-2xl sm:text-4xl">Portfolio CMS</span>
+              <span class="block mt-2 text-sm text-mute">Next.js · Supabase · Tailwind</span></span>
+        <span class="font-label text-[10px] uppercase tracking-[0.25em] text-mute text-right">Web App<span class="block mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-copper">View →</span></span>
+        <span class="index-thumb"><img src="https://picsum.photos/seed/faiz-p1/460/620?grayscale" alt="" class="w-full h-full object-cover" loading="lazy" /></span>
+      </a>
+      <a href="#" class="index-row px-5 sm:px-[5vw] group">
+        <span class="font-label text-xs text-copper">02</span>
+        <span><span class="block font-serif text-2xl sm:text-4xl">Commerce Dashboard</span>
+              <span class="block mt-2 text-sm text-mute">React · Node.js · Chart.js</span></span>
+        <span class="font-label text-[10px] uppercase tracking-[0.25em] text-mute text-right">Dashboard<span class="block mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-copper">View →</span></span>
+        <span class="index-thumb"><img src="https://picsum.photos/seed/faiz-p2/460/620?grayscale" alt="" class="w-full h-full object-cover" loading="lazy" /></span>
+      </a>
+      <a href="#" class="index-row px-5 sm:px-[5vw] group">
+        <span class="font-label text-xs text-copper">03</span>
+        <span><span class="block font-serif text-2xl sm:text-4xl">Booking System</span>
+              <span class="block mt-2 text-sm text-mute">Next.js · PostgreSQL · Prisma</span></span>
+        <span class="font-label text-[10px] uppercase tracking-[0.25em] text-mute text-right">Web App<span class="block mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-copper">View →</span></span>
+        <span class="index-thumb"><img src="https://picsum.photos/seed/faiz-p3/460/620?grayscale" alt="" class="w-full h-full object-cover" loading="lazy" /></span>
+      </a>
+      <a href="#" class="index-row px-5 sm:px-[5vw] group">
+        <span class="font-label text-xs text-copper">04</span>
+        <span><span class="block font-serif text-2xl sm:text-4xl">Company Profile</span>
+              <span class="block mt-2 text-sm text-mute">Astro · Tailwind · SEO</span></span>
+        <span class="font-label text-[10px] uppercase tracking-[0.25em] text-mute text-right">Website<span class="block mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-copper">View →</span></span>
+        <span class="index-thumb"><img src="https://picsum.photos/seed/faiz-p4/460/620?grayscale" alt="" class="w-full h-full object-cover" loading="lazy" /></span>
+      </a>
+      <a href="#" class="index-row px-5 sm:px-[5vw] group">
+        <span class="font-label text-xs text-copper">05</span>
+        <span><span class="block font-serif text-2xl sm:text-4xl">REST API Service</span>
+              <span class="block mt-2 text-sm text-mute">Node.js · Express · Redis</span></span>
+        <span class="font-label text-[10px] uppercase tracking-[0.25em] text-mute text-right">Backend<span class="block mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-copper">View →</span></span>
+        <span class="index-thumb"><img src="https://picsum.photos/seed/faiz-p5/460/620?grayscale" alt="" class="w-full h-full object-cover" loading="lazy" /></span>
+      </a>
+      <a href="#" class="index-row px-5 sm:px-[5vw] group">
+        <span class="font-label text-xs text-copper">06</span>
+        <span><span class="block font-serif text-2xl sm:text-4xl">Mobile Task App</span>
+              <span class="block mt-2 text-sm text-mute">React Native · Supabase</span></span>
+        <span class="font-label text-[10px] uppercase tracking-[0.25em] text-mute text-right">Mobile<span class="block mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-copper">View →</span></span>
+        <span class="index-thumb"><img src="https://picsum.photos/seed/faiz-p6/460/620?grayscale" alt="" class="w-full h-full object-cover" loading="lazy" /></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       PROCESS — 6 langkah alur kerja developer
+       (struktur bernomor ala Izanami, isi versi porto)
+       ══════════════════════════════════════════════════════════════ -->
+  <section id="process" class="px-5 sm:px-[7vw] py-24 border-t border-line">
+    <p class="font-label text-[11px] uppercase tracking-[0.4em] text-mute mb-14 reveal">
+      <span class="text-copper">05</span>&nbsp;&nbsp;<span class="font-jp text-copper">工程</span>&nbsp;&nbsp;<span data-i18n="sec.process">Process</span>
+    </p>
+    <ol class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-14">
+      <!-- Setiap langkah: nomor Cinzel + judul serif + deskripsi -->
+      <li class="reveal group">
+        <p class="font-label text-copper text-sm tracking-[0.3em]">01</p>
+        <h3 class="font-serif text-2xl mt-3 group-hover:italic transition-all" data-i18n="proc.t1">Inquiry</h3>
+        <p class="text-mute text-sm leading-relaxed mt-2" data-i18n="proc.d1">Diskusi kebutuhan & tujuan proyek.</p>
+      </li>
+      <li class="reveal group">
+        <p class="font-label text-copper text-sm tracking-[0.3em]">02</p>
+        <h3 class="font-serif text-2xl mt-3 group-hover:italic transition-all" data-i18n="proc.t2">Consultation</h3>
+        <p class="text-mute text-sm leading-relaxed mt-2" data-i18n="proc.d2">Penentuan scope, timeline, dan tech stack.</p>
+      </li>
+      <li class="reveal group">
+        <p class="font-label text-copper text-sm tracking-[0.3em]">03</p>
+        <h3 class="font-serif text-2xl mt-3 group-hover:italic transition-all" data-i18n="proc.t3">Design</h3>
+        <p class="text-mute text-sm leading-relaxed mt-2" data-i18n="proc.d3">Wireframe → UI di Figma, mobile-first.</p>
+      </li>
+      <li class="reveal group">
+        <p class="font-label text-copper text-sm tracking-[0.3em]">04</p>
+        <h3 class="font-serif text-2xl mt-3 group-hover:italic transition-all" data-i18n="proc.t4">Development</h3>
+        <p class="text-mute text-sm leading-relaxed mt-2" data-i18n="proc.d4">Implementasi front-end & back-end, review berkala.</p>
+      </li>
+      <li class="reveal group">
+        <p class="font-label text-copper text-sm tracking-[0.3em]">05</p>
+        <h3 class="font-serif text-2xl mt-3 group-hover:italic transition-all" data-i18n="proc.t5">Testing</h3>
+        <p class="text-mute text-sm leading-relaxed mt-2" data-i18n="proc.d5">QA, optimasi performa, dan SEO audit.</p>
+      </li>
+      <li class="reveal group">
+        <p class="font-label text-copper text-sm tracking-[0.3em]">06</p>
+        <h3 class="font-serif text-2xl mt-3 group-hover:italic transition-all" data-i18n="proc.t6">Handover</h3>
+        <p class="text-mute text-sm leading-relaxed mt-2" data-i18n="proc.d6">Deploy, dokumentasi, dan support pasca-rilis.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       EXPERIENCE — linimasa pekerjaan
+       ══════════════════════════════════════════════════════════════ -->
+  <section id="experience" class="px-5 sm:px-[7vw] py-24 border-t border-line">
+    <p class="font-label text-[11px] uppercase tracking-[0.4em] text-mute mb-12 reveal">
+      <span class="text-copper">06</span>&nbsp;&nbsp;<span class="font-jp text-copper">経験</span>&nbsp;&nbsp;<span data-i18n="sec.experience">Experience</span>
+    </p>
+    <!-- [GANTI] sinkron tabel `experiences` -->
+    <div class="space-y-10 reveal">
+      <div class="grid sm:grid-cols-[140px_1fr] gap-4 border-b border-line pb-8">
+        <p class="font-label text-[11px] tracking-[0.2em] text-mute">2023 — Now</p>
+        <div><h3 class="font-serif text-2xl">Fullstack Developer</h3><p class="text-copper text-sm mt-1">Tech Studio · Jakarta</p>
+        <p class="text-mute text-sm leading-relaxed mt-3">Membangun aplikasi web end-to-end dengan Next.js & Supabase.</p></div>
+      </div>
+      <div class="grid sm:grid-cols-[140px_1fr] gap-4 border-b border-line pb-8">
+        <p class="font-label text-[11px] tracking-[0.2em] text-mute">2021 — 2023</p>
+        <div><h3 class="font-serif text-2xl">Frontend Developer</h3><p class="text-copper text-sm mt-1">Digital Agency · Bandung</p>
+        <p class="text-mute text-sm leading-relaxed mt-3">Landing page & dashboard interaktif untuk 20+ klien.</p></div>
+      </div>
+      <div class="grid sm:grid-cols-[140px_1fr] gap-4">
+        <p class="font-label text-[11px] tracking-[0.2em] text-mute">2020 — 2021</p>
+        <div><h3 class="font-serif text-2xl">Junior Web Developer</h3><p class="text-copper text-sm mt-1">Startup · Remote</p>
+        <p class="text-mute text-sm leading-relaxed mt-3">Perbaikan bug, integrasi API, dan optimasi SEO.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       BLOG — 3 kartu artikel terbaru
+       ══════════════════════════════════════════════════════════════ -->
+  <section id="blog" class="px-5 sm:px-[7vw] py-24 border-t border-line">
+    <div class="flex items-end justify-between gap-6 mb-12">
+      <p class="font-label text-[11px] uppercase tracking-[0.4em] text-mute reveal">
+        <span class="text-copper">07</span>&nbsp;&nbsp;<span class="font-jp text-copper">記事</span>&nbsp;&nbsp;<span data-i18n="sec.blog">Latest Posts</span>
+      </p>
+      <a href="#" class="link-line font-label text-[11px] uppercase tracking-[0.25em] text-mute hover:text-bone transition-colors reveal" data-i18n="cta.viewall2">View all →</a>
+    </div>
+    <!-- [GANTI] sinkron tabel `posts` -->
+    <div class="grid md:grid-cols-3 gap-8 reveal">
+      <a href="#" class="group">
+        <div class="overflow-hidden"><img src="https://picsum.photos/seed/faiz-b1/800/500?grayscale" alt="" loading="lazy" class="w-full aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-105" /></div>
+        <p class="font-label text-[10px] uppercase tracking-[0.3em] text-mute mt-4">Tutorial</p>
+        <h3 class="font-serif text-xl mt-2 group-hover:text-copper transition-colors">Optimasi Core Web Vitals di Next.js</h3>
+        <p class="text-mute text-sm mt-2">12 Agu 2026 · 6 mnt baca</p>
+      </a>
+      <a href="#" class="group">
+        <div class="overflow-hidden"><img src="https://picsum.photos/seed/faiz-b2/800/500?grayscale" alt="" loading="lazy" class="w-full aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-105" /></div>
+        <p class="font-label text-[10px] uppercase tracking-[0.3em] text-mute mt-4">Case Study</p>
+        <h3 class="font-serif text-xl mt-2 group-hover:text-copper transition-colors">Membangun CMS Headless dengan Supabase</h3>
+        <p class="text-mute text-sm mt-2">28 Jul 2026 · 9 mnt baca</p>
+      </a>
+      <a href="#" class="group">
+        <div class="overflow-hidden"><img src="https://picsum.photos/seed/faiz-b3/800/500?grayscale" alt="" loading="lazy" class="w-full aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-105" /></div>
+        <p class="font-label text-[10px] uppercase tracking-[0.3em] text-mute mt-4">Design</p>
+        <h3 class="font-serif text-xl mt-2 group-hover:text-copper transition-colors">Tipografi Serif untuk Antarmuka Modern</h3>
+        <p class="text-mute text-sm mt-2">10 Jul 2026 · 5 mnt baca</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       GALLERY — grid foto 6 kolom (2/3 kolom responsif)
+       ══════════════════════════════════════════════════════════════ -->
+  <section id="gallery" class="px-5 sm:px-[7vw] py-24 border-t border-line">
+    <p class="font-label text-[11px] uppercase tracking-[0.4em] text-mute mb-12 reveal">
+      <span class="text-copper">08</span>&nbsp;&nbsp;<span class="font-jp text-copper">写真</span>&nbsp;&nbsp;<span data-i18n="sec.gallery">Gallery</span>
+    </p>
+    <!-- [GANTI] sinkron tabel `galleries` (bucket storage) -->
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 reveal">
+      <img src="https://picsum.photos/seed/faiz-g1/700/700?grayscale" alt="" loading="lazy" class="w-full aspect-square object-cover hover:opacity-80 transition-opacity" />
+      <img src="https://picsum.photos/seed/faiz-g2/700/700?grayscale" alt="" loading="lazy" class="w-full aspect-square object-cover hover:opacity-80 transition-opacity" />
+      <img src="https://picsum.photos/seed/faiz-g3/700/700?grayscale" alt="" loading="lazy" class="w-full aspect-square object-cover hover:opacity-80 transition-opacity" />
+      <img src="https://picsum.photos/seed/faiz-g4/700/700?grayscale" alt="" loading="lazy" class="w-full aspect-square object-cover hover:opacity-80 transition-opacity" />
+      <img src="https://picsum.photos/seed/faiz-g5/700/700?grayscale" alt="" loading="lazy" class="w-full aspect-square object-cover hover:opacity-80 transition-opacity" />
+      <img src="https://picsum.photos/seed/faiz-g6/700/700?grayscale" alt="" loading="lazy" class="w-full aspect-square object-cover hover:opacity-80 transition-opacity" />
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       CONTACT + FOOTER — CTA besar, email, sosial media, jam Jakarta
+       ══════════════════════════════════════════════════════════════ -->
+  <footer id="contact" class="px-5 sm:px-[7vw] pt-28 pb-10 border-t border-line">
+    <p class="font-label text-[11px] uppercase tracking-[0.4em] text-mute mb-8 reveal">
+      <span class="text-copper">09</span>&nbsp;&nbsp;<span class="font-jp text-copper">連絡</span>&nbsp;&nbsp;<span data-i18n="sec.contact">Contact</span>
+    </p>
+    <h2 class="font-serif text-5xl sm:text-7xl leading-tight reveal">
+      <span data-i18n="contact.title">Let's</span> <em class="italic text-copper" data-i18n="contact.subtitle">Connect</em>
+    </h2>
+    <a href="mailto:hello@faizdev.example"
+       class="link-line inline-block mt-8 font-label text-sm uppercase tracking-[0.3em] text-bone hover:text-copper transition-colors reveal">
+      hello@faizdev.example →
+    </a>
+
+    <!-- Baris bawah: sosial media + copyright + jam (pengganti lokasi Dubai/Tokyo) -->
+    <div class="mt-20 pt-8 border-t border-line flex flex-col sm:flex-row items-center justify-between gap-6 font-label text-[10px] uppercase tracking-[0.3em] text-mute">
+      <!-- [GANTI] sinkron tabel `social_media` -->
+      <div class="flex gap-6">
+        <a href="#" class="link-line hover:text-bone transition-colors">GitHub</a>
+        <a href="#" class="link-line hover:text-bone transition-colors">LinkedIn</a>
+        <a href="#" class="link-line hover:text-bone transition-colors">Instagram</a>
+      </div>
+      <span>© 2026 Faiz Dev</span>
+      <span>Jakarta&nbsp;·&nbsp;<span id="footer-clock">--:--:--</span>&nbsp;WIB</span>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       JAVASCRIPT MURNI — modular, satu IIFE per fitur
+       ══════════════════════════════════════════════════════════════ -->
+  <script>
+    (function () {
+      'use strict';
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ── MODUL 1: MENU OVERLAY ─────────────────────────────────
+         Buka/tutup overlay, animasi stagger link via --i, tutup dengan
+         Escape / klik tautan. Aria-expanded menjaga aksesibilitas. */
+      const menu = document.getElementById('menu');
+      const menuBtn = document.getElementById('menu-btn');
+      const burger = menuBtn.querySelectorAll('.burger-line');
+
+      function setMenu(open) {
+        menu.classList.toggle('open', open);
+        menu.setAttribute('aria-hidden', String(!open));
+        menuBtn.setAttribute('aria-expanded', String(open));
+        document.body.style.overflow = open ? 'hidden' : '';
+        // Burger → X
+        burger[0].style.transform = open ? 'translateY(2px) rotate(45deg)' : '';
+        burger[1].style.transform = open ? 'translateY(-2px) rotate(-45deg)' : '';
+        // Stagger link: delay = index * 60ms
+        menu.querySelectorAll('.menu-link').forEach((el, i) => {
+          el.style.transitionDelay = open ? `${0.08 + i * 0.06}s` : '0s';
+        });
+      }
+      menuBtn.addEventListener('click', () => setMenu(!menu.classList.contains('open')));
+      menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+      window.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+
+      /* ── MODUL 2: TOGGLE BAHASA ID | EN ────────────────────────
+         Semua elemen ber-atribut data-i18n ditukar teksnya sesuai
+         kamus di bawah. Default: ID (bahasa web porto). */
+      const dict = {
+        id: null, // null = pakai teks asli di HTML (sudah Indonesia/Inggris campur sesuai desain)
+        en: {
+          'menu': 'Menu',
+          'nav.home': 'Home', 'nav.about': 'About', 'nav.projects': 'Projects',
+          'nav.featured': 'Featured', 'nav.all': 'All', 'nav.experience': 'Experience',
+          'nav.blog': 'Blog', 'nav.gallery': 'Gallery', 'nav.contact': 'Contact',
+          'hero.kicker': 'Portfolio', 'hero.hi': "Hi, I'm",
+          'hero.tagline': 'We craft elegant, high-performance web experiences rooted in clean design.',
+          'hero.scroll': 'Scroll',
+          'sec.about': 'About', 'sec.skills': 'Skills & Tools', 'sec.projects': 'Selected Work',
+          'sec.process': 'Process', 'sec.experience': 'Experience', 'sec.blog': 'Latest Posts',
+          'sec.gallery': 'Gallery', 'sec.contact': 'Contact',
+          'about.statement': 'I build digital products that are fast, elegant, and memorable — from interface down to data architecture.',
+          'about.body': 'Fullstack developer focused on Next.js, TypeScript, and Supabase. I believe performance and aesthetics matter equally.',
+          'stat.years': 'Years', 'stat.projects': 'Projects', 'stat.clients': 'Clients',
+          'cta.viewall': 'View all →', 'cta.viewall2': 'View all →',
+          'proc.t1': 'Inquiry', 'proc.d1': 'Discuss needs & project goals.',
+          'proc.t2': 'Consultation', 'proc.d2': 'Scope, timeline, and tech stack.',
+          'proc.t3': 'Design', 'proc.d3': 'Wireframe → UI in Figma, mobile-first.',
+          'proc.t4': 'Development', 'proc.d4': 'Front-end & back-end build, regular review.',
+          'proc.t5': 'Testing', 'proc.d5': 'QA, performance tuning, and SEO audit.',
+          'proc.t6': 'Handover', 'proc.d6': 'Deploy, documentation, and post-launch support.',
+          'contact.title': "Let's", 'contact.subtitle': 'Connect',
+        },
+      };
+      let lang = 'id';
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          lang = btn.dataset.lang;
+          // Tandai tombol aktif
+          document.querySelectorAll('.lang-btn').forEach(b => {
+            b.classList.toggle('text-bone', b === btn);
+            b.classList.toggle('text-mute', b !== btn);
+          });
+          // Tukar semua teks ber-atribut data-i18n
+          document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.dataset.i18n;
+            if (lang === 'en' && dict.en[key]) el.textContent = dict.en[key];
+            // kembali ke ID: muat ulang teks asli dari atribut data-id (di-cache saat init)
+            if (lang === 'id' && el.dataset.id) el.textContent = el.dataset.id;
+          });
+          document.documentElement.lang = lang;
+        });
+      });
+      // Cache teks awal (ID) agar toggle bisa kembali
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.dataset.id = el.textContent; });
+
+      /* ── MODUL 3: REVEAL ON SCROLL ─────────────────────────────
+         IntersectionObserver menambah .in-view saat elemen masuk
+         viewport. Murah: hanya class toggle, animasi di CSS. */
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(en => {
+          if (en.isIntersecting) { en.target.classList.add('in-view'); io.unobserve(en.target); }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+      /* ── MODUL 4: JAM JAKARTA LIVE ─────────────────────────────
+         Dua jam (menu + footer) berbagi satu interval. */
+      const fmt = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
+      function tick() {
+        const t = fmt.format(new Date()).replace(/\./g, ':');
+        const a = document.getElementById('menu-clock'); if (a) a.textContent = t;
+        const b = document.getElementById('footer-clock'); if (b) b.textContent = t;
+      }
+      tick(); setInterval(tick, 1000);
+
+      /* ── MODUL 5: HEADER STATE ─────────────────────────────────
+         Latar header muncul setelah scroll > 24px; sembunyi saat
+         scroll turun, muncul lagi saat scroll naik (rAF-throttled). */
+      const header = document.getElementById('site-header');
+      let lastY = scrollY, ticking = false;
+      addEventListener('scroll', () => {
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(() => {
+          const y = scrollY;
+          header.classList.toggle('bg-ink/85', y > 24);
+          header.classList.toggle('backdrop-blur-md', y > 24);
+          header.classList.toggle('border-line', y > 24);
+          header.style.transform = (y > lastY + 6 && y > 140 && !menu.classList.contains('open')) ? 'translateY(-100%)' : 'translateY(0)';
+          header.classList.toggle('transition-transform', true);
+          header.style.transition = 'transform .45s cubic-bezier(.22,.61,.36,1), background .5s ease';
+          lastY = y; ticking = false;
+        });
+      }, { passive: true });
+
+      /* ── MODUL 6: SMOOTH SCROLL (LERP) ─────────────────────────
+         Guliran roda di-lerp menuju target agar terasa "very smooth"
+         ala situs Awwwards. Otomatis NONAKTIF untuk: perangkat sentuh,
+         prefers-reduced-motion. Anchor link tetap memakai CSS smooth. */
+      if (!reduced && window.matchMedia('(pointer: fine)').matches) {
+        let target = scrollY, current = scrollY, raf = null;
+        const max = () => document.documentElement.scrollHeight - innerHeight;
+        addEventListener('wheel', e => {
+          e.preventDefault();
+          target = Math.max(0, Math.min(target + e.deltaY, max()));
+          if (!raf) raf = requestAnimationFrame(loop);
+        }, { passive: false });
+        function loop() {
+          current += (target - current) * 0.1;               // faktor lerp 0.1 = halus
+          if (Math.abs(target - current) < 0.5) { current = target; raf = null; }
+          else raf = requestAnimationFrame(loop);
+          scrollTo(0, current);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

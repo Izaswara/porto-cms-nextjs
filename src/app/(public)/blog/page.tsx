@@ -5,7 +5,12 @@ import { isValidLocale, getTranslations } from '@/lib/i18n';
 import { BlogCard } from '@/components/public/Cards';
 import FilterBar from '@/components/public/FilterBar';
 
-export const metadata: Metadata = { title: 'Blog' };
+export const metadata: Metadata = {
+  title: 'Blog',
+  description: 'Kumpulan artikel, tutorial, dan tulisan terbaru seputar pengembangan web.',
+  alternates: { canonical: '/blog' },
+  openGraph: { title: 'Blog', url: '/blog' },
+};
 
 const PER_PAGE = 9;
 
@@ -55,9 +60,10 @@ export default async function BlogPage({
   }
 
   return (
-    <div className="pt-28 pb-20 min-h-screen">
+    <div className="pt-28 pb-20 min-h-screen" data-book>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <h1 className="font-[Space_Grotesk] text-4xl font-bold text-white mb-2">
+        <p className="aw-eyebrow mb-4"><span className="aw-num">/</span> <span className="aw-kanji">記事</span> Writing</p>
+        <h1 className="section-heading text-white mb-2 text-balance">
           Latest <span className="text-gradient">Posts</span>
         </h1>
         <p className="text-slate-500 mb-10">Artikel dan tulisan terbaru.</p>
@@ -77,7 +83,7 @@ export default async function BlogPage({
                 {currentPage > 1 && (
                   <a
                     href={pageHref(currentPage - 1)}
-                    className="inline-flex items-center min-h-10 px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all glass-card"
+                    className="inline-flex items-center min-h-10 px-4 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all glass-card"
                   >
                     ← Prev
                   </a>
@@ -86,12 +92,11 @@ export default async function BlogPage({
                   <a
                     key={p}
                     href={pageHref(p)}
-                    className={`inline-flex items-center justify-center min-w-10 min-h-10 px-4 py-2 rounded-lg text-sm transition-all ${
+                    className={`inline-flex items-center justify-center min-w-10 min-h-10 px-4 py-2 text-sm transition-all ${
                       p === currentPage
-                        ? 'text-white font-semibold'
+                        ? 'chip-active font-semibold'
                         : 'text-slate-400 hover:text-white hover:bg-white/5 glass-card'
                     }`}
-                    style={p === currentPage ? { background: 'linear-gradient(135deg, var(--p-primary), var(--p-secondary))' } : undefined}
                   >
                     {p}
                   </a>
@@ -99,7 +104,7 @@ export default async function BlogPage({
                 {currentPage < totalPages && (
                   <a
                     href={pageHref(currentPage + 1)}
-                    className="inline-flex items-center min-h-10 px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all glass-card"
+                    className="inline-flex items-center min-h-10 px-4 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all glass-card"
                   >
                     Next →
                   </a>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import Image from 'next/image';
 
 interface LightboxProps {
   images: string[];
@@ -36,7 +37,7 @@ export default function Lightbox({ images }: LightboxProps) {
       <img
         src={images[index]}
         alt=""
-        className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg"
+        className="max-h-[85vh] max-w-[90vw] object-contain"
         onClick={(e) => e.stopPropagation()}
       />
       <button
@@ -80,10 +81,9 @@ export function GalleryGrid({ images, label }: { images: string[]; label: string
           <button
             key={i}
             onClick={() => setOpen(true)}
-            className="group relative aspect-square overflow-hidden rounded-xl glass-card cursor-pointer"
+            className="group relative aspect-square overflow-hidden glass-card cursor-pointer"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt={`${label} ${i + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <Image src={src} alt={`${label} ${i + 1}`} fill sizes="(max-width: 1024px) 50vw, 33vw" loading={i < 6 ? 'eager' : 'lazy'} className="object-cover group-hover:scale-110 transition-transform duration-500" />
             <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 text-white text-2xl">
               🔍
             </span>

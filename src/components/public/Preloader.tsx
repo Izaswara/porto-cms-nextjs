@@ -1,135 +1,115 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import VideoOverlay from './VideoOverlay';
+import { useEffect, useState } from 'react';
 
-const PHASES = ['INITIALIZING', 'LOADING ASSETS', 'CALIBRATING', 'COMPILING SHADERS', 'SYNCING CORE', 'SYSTEM READY'];
-const JA_LINES = [
-  '世界へようこそ — Welcome to the world',
-  '想像の先へ — Beyond imagination',
-  '火花散る物語 — A story of sparks',
-  '魂を燃やせ — Ignite your soul',
-];
-
-export default function Preloader({ siteName = 'FAIZ INDRIASWARA' }: { siteName?: string }) {
-  const [hidden, setHidden] = useState(false);
+/**
+ * Preloader — layar pembuka ala Izanami:
+ *
+ *  - Curtain hitam pekat menutup seluruh layar saat halaman dimuat.
+ *  - Counter persentase 0 → 100 dengan easing organik (cepat di awal,
+ *    melambat mendekati 100) + garis progres hairline.
+ *  - Quote filosofis + aksen kanji di tengah untuk kesan eksklusif.
+ *  - Di 100%: jeda sejenak, lalu curtain memudar & dibongkar dari DOM.
+ *
+ * Detail teknis:
+ *  - Selama loading, body diberi kelas .is-loading → animasi entrance
+ *    hero (fade-up / hero-letter) dijeda agar terlihat SETELAH curtain
+ *    terbuka, bukan terlewat di baliknya.
+ *  - Tanpa JavaScript: <noscript> menyembunyikan preloader.
+ *  - prefers-reduced-motion → preloader dilewati total.
+ *  - Hanya tampil sekali per pemuatan penuh (layout App Router tidak
+ *    me-remount saat navigasi client-side).
+ */
+export default function Preloader() {
   const [pct, setPct] = useState(0);
-  const [phase, setPhase] = useState(0);
-  const [ja, setJa] = useState('');
-  const starsRef = useRef<HTMLDivElement>(null);
-  const particlesRef = useRef<HTMLDivElement>(null);
+  const [fading, setFading] = useState(false);
+  const [gone, setGone] = useState(false);
 
   useEffect(() => {
-    // Starfield
-    const space = starsRef.current;
-    if (space) {
-      for (let i = 0; i < 60; i++) {
-        const s = document.createElement('span');
-        s.className = 'loader-star';
-        const size = Math.random() * 2.5 + 1;
-        s.style.width = `${size}px`;
-        s.style.height = `${size}px`;
-        s.style.left = `${Math.random() * 100}%`;
-        s.style.top = `${Math.random() * 100}%`;
-        s.style.animationDuration = `${2 + Math.random() * 4}s`;
-        s.style.animationDelay = `${Math.random() * 2}s`;
-        space.appendChild(s);
-      }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setGone(true);
+      return;
     }
 
-    // Sparkle particles (loader-particle)
-    const wrap = particlesRef.current;
-    if (wrap) {
-      for (let i = 0; i < 14; i++) {
-        const pt = document.createElement('span');
-        pt.className = 'loader-particle';
-        const sz = Math.random() * 4 + 2;
-        pt.style.width = `${sz}px`;
-        pt.style.height = `${sz}px`;
-        pt.style.left = `${Math.random() * 100}%`;
-        pt.style.top = `${Math.random() * 100}%`;
-        wrap.appendChild(pt);
-      }
-    }
+    document.body.classList.add('is-loading');
+    document.body.style.overflow = 'hidden';
 
-    // Progress
-    const start = Date.now();
-    const DURATION = 2200;
-    const tick = () => {
-      const elapsed = Date.now() - start;
-      const p = Math.min(100, Math.round((elapsed / DURATION) * 100));
-      setPct(p);
-      setPhase(Math.min(PHASES.length - 1, Math.floor((p / 100) * (PHASES.length - 1))));
-      if (p < 100) {
-        setTimeout(tick, 60);
+    const DURATION = 2000;
+    const start = performance.now();
+    let raf = 0;
+
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / DURATION);
+      const eased = 1 - Math.pow(1 - t, 2.2); // cepat → melambat mendekati 100
+      setPct(Math.min(100, Math.floor(eased * 100)));
+      if (t < 1) {
+        raf = requestAnimationFrame(tick);
       } else {
-        setTimeout(() => setHidden(true), 300);
+        setPct(100);
+        // Tahan sejenak di 100, lalu buka curtain
+        setTimeout(() => {
+          setFading(true);
+          document.body.classList.remove('is-loading');
+          document.body.style.overflow = '';
+          setTimeout(() => setGone(true), 800);
+        }, 380);
       }
     };
-    setTimeout(tick, 150);
+    raf = requestAnimationFrame(tick);
 
-    // Japanese tagline typing
-    const line = JA_LINES[Math.floor(Math.random() * JA_LINES.length)];
-    let i = 0;
-    const type = () => {
-      if (i > line.length) return;
-      setJa(line.slice(0, i) + '<span class="ja-cursor">▍</span>');
-      i++;
-      setTimeout(type, 50);
+    return () => {
+      cancelAnimationFrame(raf);
+      document.body.classList.remove('is-loading');
+      document.body.style.overflow = '';
     };
-    setTimeout(type, 600);
-
-    // Fallback hide after 4.2s
-    const fallback = setTimeout(() => setHidden(true), 4200);
-    return () => clearTimeout(fallback);
   }, []);
 
+  if (gone) return null;
+
   return (
-    <div id="preloader" className={hidden ? 'hidden charging' : 'charging'} aria-hidden={hidden}>
-      <VideoOverlay id="loading-video" src="/videos/loading.mp4" variant="fade" loop preload="auto" playing={!hidden} />
-      <div className="loader-space" ref={starsRef} />
-      <div className="loader-orb" style={{ width: 420, height: 420, background: 'var(--p-primary)', top: '10%', left: '15%' }} />
-      <div className="loader-orb" style={{ width: 360, height: 360, background: 'var(--p-secondary)', bottom: '10%', right: '12%', animationDelay: '-4.5s' }} />
-      <div className="loader-orb" style={{ width: 260, height: 260, background: 'var(--p-accent)', top: '55%', left: '60%', animationDelay: '-8s', opacity: 0.25 }} />
+    <div
+      id="preloader"
+      aria-hidden="true"
+      className={`fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center transition-opacity duration-700 ease-out ${
+        fading ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      }`}
+    >
+      {/* Quote filosofis + aksen kanji */}
+      <p className="font-jp text-copper text-sm tracking-[0.5em] mb-6" style={{ color: '#d4d4d4' }}>
+        静けさ
+      </p>
+      <p className="font-serif italic text-2xl sm:text-3xl text-white/90 text-center px-6 max-w-xl leading-relaxed">
+        &ldquo;Ketenangan adalah ruang
+        <br />
+        bagi ide-ide besar.&rdquo;
+      </p>
+      <p className="font-label text-[10px] uppercase tracking-[0.45em] text-white/40 mt-6">
+        Faiz Dev — Portfolio
+      </p>
 
-      <div className="loader-particle-wrap" ref={particlesRef} />
-
-      <svg className="loader-emblem" viewBox="0 0 220 220" aria-hidden="true">
-        <circle className="em-1" cx="110" cy="110" r="96" />
-        <circle className="em-2" cx="110" cy="110" r="80" />
-        <circle className="em-3" cx="110" cy="110" r="64" />
-      </svg>
-
-      <div className="loader-ring">
-        <div className="loader-core" />
-        <span className="loader-speed l" />
-        <span className="loader-speed r" />
-      </div>
-
-      <div className="loader-phase">
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--p-accent)', boxShadow: '0 0 8px var(--p-accent)', animation: 'pulse 1s infinite' }} />
-        {PHASES[phase]}
-      </div>
-      <div className="loader-ja" dangerouslySetInnerHTML={{ __html: ja }} style={{ minHeight: 14 }} />
-
-      <div className="loader-name" id="loader-name" aria-label={siteName}>
-        {siteName.split('').map((ch, i) => (
-          <span key={i} className={'loader-name-letter' + (ch === ' ' ? ' space' : '')} style={{ animationDelay: `${350 + i * 70}ms` }}>
-            {ch === ' ' ? '\u00A0' : ch}
+      {/* Counter + progress bar */}
+      <div className="absolute bottom-10 left-6 sm:left-12 right-6 sm:right-12">
+        <div className="h-px w-full bg-white/15 overflow-hidden">
+          <div
+            className="h-full bg-white transition-[width] duration-150 ease-out"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <div className="flex items-end justify-between mt-4">
+          <span className="font-label text-[10px] uppercase tracking-[0.4em] text-white/40">
+            Loading
           </span>
-        ))}
+          <span className="font-serif text-5xl sm:text-6xl text-white leading-none tabular-nums">
+            {pct}
+            <span className="text-xl text-white/50 ml-1">%</span>
+          </span>
+        </div>
       </div>
 
-      <div className="loader-bar">
-        <span />
-        <em className="loader-pct">{pct}%</em>
-      </div>
-      <div className="loader-text">
-        {'LOADING'.split('').map((ch, i) => (
-          <span className="loader-char" key={i} style={{ '--i': i } as React.CSSProperties}>{ch}</span>
-        ))}
-      </div>
-      <div className="loader-anime">✦ ENTERING THE DIGITAL WORLD ✦</div>
+      {/* Tanpa JS: preloader disembunyikan agar halaman tetap terbaca */}
+      <noscript>
+        <style>{'#preloader{display:none}'}</style>
+      </noscript>
     </div>
   );
 }

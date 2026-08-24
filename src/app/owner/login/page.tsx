@@ -41,7 +41,7 @@ export default function OwnerLoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="text-3xl mb-3">🚀</div>
-          <h1 className="font-[Space_Grotesk] text-2xl font-bold text-white">Porto CMS</h1>
+          <h1 className="font-display text-2xl font-bold text-white">Porto CMS</h1>
           <p className="text-slate-400 text-sm mt-1">Masuk ke dashboard owner</p>
         </div>
         <form onSubmit={onSubmit} className="space-y-4 bg-slate-900/60 border border-white/10 rounded-2xl p-6">

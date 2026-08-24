@@ -78,7 +78,7 @@ export default function OwnerDashboardPage() {
 
   return (
     <div>
-      <h1 className="font-[Space_Grotesk] text-2xl md:text-3xl font-bold text-white">
+      <h1 className="font-display text-2xl md:text-3xl font-bold text-white">
         Halo, {stats.site_name || 'Owner'} 👋
       </h1>
       <p className="text-slate-400 text-sm mt-1">Ringkasan konten situs Anda.</p>
@@ -86,12 +86,12 @@ export default function OwnerDashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mt-8">
         {CARD_META.map((c) => (
           <Link key={c.key} href={c.href} className="rounded-xl bg-slate-900/70 border border-white/10 p-4 hover:border-cyan-400/40 transition-colors group">
-            <div className={`text-3xl font-bold font-[Space_Grotesk] ${c.color}`}>{stats.counts[c.key] ?? 0}</div>
+            <div className={`text-3xl font-bold font-display ${c.color}`}>{stats.counts[c.key] ?? 0}</div>
             <div className="text-xs text-slate-400 mt-1 group-hover:text-slate-200 transition-colors">{c.label}</div>
           </Link>
         ))}
         <Link href="/owner/resources/contacts?page=1" className="rounded-xl bg-slate-900/70 border border-white/10 p-4 hover:border-cyan-400/40 transition-colors group relative">
-          <div className="text-3xl font-bold font-[Space_Grotesk] text-emerald-300">{stats.contacts?.total ?? 0}</div>
+          <div className="text-3xl font-bold font-display text-emerald-300">{stats.contacts?.total ?? 0}</div>
           <div className="text-xs text-slate-400 mt-1 group-hover:text-slate-200 transition-colors">Pesan Masuk</div>
           {unread > 0 && (
             <span className="absolute top-3 right-3 bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
@@ -100,7 +100,7 @@ export default function OwnerDashboardPage() {
           )}
         </Link>
         <div className="rounded-xl bg-slate-900/70 border border-white/10 p-4">
-          <div className="text-3xl font-bold font-[Space_Grotesk] text-white">{stats.users ?? 0}</div>
+          <div className="text-3xl font-bold font-display text-white">{stats.users ?? 0}</div>
           <div className="text-xs text-slate-400 mt-1">Users</div>
         </div>
       </div>

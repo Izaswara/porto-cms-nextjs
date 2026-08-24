@@ -3,8 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Button, Field, PageHeader, Spinner, TextArea, TextInput, Toggle } from '@/components/admin/ui';
+import { ImageInput } from '@/components/admin/image-input';
 
-const SECTION_META: Record<string, { title: string; desc: string; fields: { name: string; label: string; type: 'text' | 'textarea' | 'toggle' | 'json'; hint?: string }[] }> = {
+interface SectionField {
+  name: string;
+  label: string;
+  type: 'text' | 'textarea' | 'toggle' | 'json' | 'image';
+  hint?: string;
+}
+
+const SECTION_META: Record<string, { title: string; desc: string; fields: SectionField[] }> = {
   hero: {
     title: 'Hero Section',
     desc: 'Banner utama halaman depan',
@@ -15,8 +23,8 @@ const SECTION_META: Record<string, { title: string; desc: string; fields: { name
       { name: 'description', label: 'Deskripsi', type: 'textarea' },
       { name: 'background_type', label: 'Tipe Background', type: 'text' },
       { name: 'background_value', label: 'Nilai Background', type: 'text' },
-      { name: 'background_image', label: 'Background Image', type: 'text' },
-      { name: 'photo', label: 'Foto', type: 'text' },
+      { name: 'background_image', label: 'Background Image', type: 'image' },
+      { name: 'photo', label: 'Foto', type: 'image' },
       { name: 'buttons', label: 'Buttons', type: 'json', hint: 'Array JSON tombol CTA' },
       { name: 'social_media', label: 'Social Media', type: 'json' },
       { name: 'is_active', label: 'Aktif', type: 'toggle' },
@@ -26,13 +34,11 @@ const SECTION_META: Record<string, { title: string; desc: string; fields: { name
     title: 'About Section',
     desc: 'Bagian tentang saya',
     fields: [
-      { name: 'name', label: 'Nama', type: 'text' },
-      { name: 'subtitle', label: 'Subtitle', type: 'text' },
+      { name: 'photo', label: 'Foto', type: 'image', hint: 'Upload foto baru atau pilih dari media library (maks 4MB)' },
       { name: 'description', label: 'Deskripsi', type: 'textarea' },
-      { name: 'image', label: 'Foto', type: 'text' },
+      { name: 'quote', label: 'Quote', type: 'text' },
       { name: 'statistics', label: 'Statistik', type: 'json', hint: 'Contoh: [{"label":"Proyek","value":10}]' },
-      { name: 'services', label: 'Layanan', type: 'json' },
-      { name: 'social_media', label: 'Social Media', type: 'json' },
+      { name: 'skills', label: 'Skills', type: 'json', hint: 'Array JSON nama skill, contoh: ["React","Laravel"]' },
       { name: 'is_active', label: 'Aktif', type: 'toggle' },
     ],
   },
@@ -99,6 +105,17 @@ export default function OwnerSectionPage() {
                 <Field key={f.name} label={f.label} hint={f.hint} {...props}>
                   <TextArea value={typeof val === 'string' ? val : ''} onChange={(e) => setData((d) => ({ ...d!, [f.name]: e.target.value }))} />
                 </Field>
+              );
+            }
+            if (f.type === 'image') {
+              return (
+                <ImageInput
+                  key={f.name}
+                  label={f.label}
+                  hint={f.hint}
+                  value={typeof val === 'string' ? val : ''}
+                  onChange={(v) => setData((d) => ({ ...d!, [f.name]: v }))}
+                />
               );
             }
             if (f.type === 'toggle') {

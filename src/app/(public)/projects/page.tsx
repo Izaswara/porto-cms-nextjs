@@ -6,7 +6,12 @@ import { t } from '@/lib/public-data';
 import { ProjectCard } from '@/components/public/Cards';
 import FilterBar from '@/components/public/FilterBar';
 
-export const metadata: Metadata = { title: 'Projects' };
+export const metadata: Metadata = {
+  title: 'Projects',
+  description: 'Kumpulan project web dan software yang pernah saya kerjakan.',
+  alternates: { canonical: '/projects' },
+  openGraph: { title: 'Projects', url: '/projects' },
+};
 
 export default async function ProjectsPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string }> }) {
   const sp = await searchParams;
@@ -28,9 +33,10 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
   const categories = [...new Set((catRes.data ?? []).map((r) => String(r.category)).filter(Boolean))];
 
   return (
-    <div className="pt-28 pb-20 min-h-screen">
+    <div className="pt-28 pb-20 min-h-screen" data-book>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <h1 className="font-[Space_Grotesk] text-4xl font-bold text-white mb-2">
+        <p className="aw-eyebrow mb-4"><span className="aw-num">/</span> <span className="aw-kanji">作品</span> Archive</p>
+        <h1 className="section-heading text-white mb-2 text-balance">
           All <span className="text-gradient">Projects</span>
         </h1>
         <p className="text-slate-500 mb-10">Kumpulan project yang pernah saya kerjakan.</p>

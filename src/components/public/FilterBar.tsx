@@ -28,7 +28,7 @@ export default function FilterBar({ categories, placeholder }: { categories: str
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
 
-  const chipBase = 'px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer';
+  const chipBase = 'px-3.5 py-1.5 text-xs font-medium transition-all cursor-pointer border';
   const textStyle = { color: 'var(--app-text)' };
   const mutedStyle = { color: 'var(--app-muted)' };
 
@@ -39,7 +39,7 @@ export default function FilterBar({ categories, placeholder }: { categories: str
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={placeholder ?? 'Cari...'}
-          className="w-full glass-card rounded-xl px-4 py-2.5 pr-10 text-sm outline-none"
+          className="w-full glass-card px-4 py-2.5 pr-10 text-sm outline-none"
           style={{ color: 'var(--app-text)', background: 'transparent' }}
         />
         <svg
@@ -61,12 +61,8 @@ export default function FilterBar({ categories, placeholder }: { categories: str
             <button
               key={c || 'all'}
               onClick={() => push(q, c)}
-              className={`${chipBase} ${active ? '' : 'glass-card'}`}
-              style={
-                active
-                  ? { background: 'linear-gradient(135deg, var(--p-primary), var(--p-secondary))', color: '#fff' }
-                  : { color: 'var(--app-muted)' }
-              }
+              className={`${chipBase} ${active ? 'chip-active border-transparent' : 'glass-card'}`}
+              style={!active ? { color: 'var(--app-muted)', borderColor: 'var(--hairline)' } : undefined}
             >
               {c || 'Semua'}
             </button>

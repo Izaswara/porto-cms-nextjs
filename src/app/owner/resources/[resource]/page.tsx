@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { RESOURCE_SCHEMAS } from '@/lib/admin-schemas';
 import type { AdminField, ResourceSchema } from '@/lib/admin-schemas';
 import { Button, Empty, Field, Modal, PageHeader, Spinner, Td, Th, TextArea, TextInput, Toggle, Select } from '@/components/admin/ui';
+import { ImageInput } from '@/components/admin/image-input';
 
 interface Row {
   id: number;
@@ -69,6 +70,15 @@ function FieldInput({ field, value, onChange, errors }: {
         <Field label={field.label} hint={field.hint} {...common}>
           <Select options={field.options || []} value={String(value ?? '')} onChange={onChange} />
         </Field>
+      );
+    case 'image':
+      return (
+        <ImageInput
+          label={field.label}
+          hint={field.hint}
+          value={typeof value === 'string' ? value : ''}
+          onChange={(v) => onChange(v)}
+        />
       );
     case 'url':
     case 'text':
@@ -252,7 +262,7 @@ export default function OwnerResourcePage({ params }: { params: Promise<{ resour
       <Modal open={Boolean(editing !== null && schema)} onClose={() => { setEditing(null); setIsNew(false); }} title={`${isNew ? 'Tambah' : 'Edit'} ${s.singular}`} wide>
         <form onSubmit={save} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {s.fields.map((f) => (
-            <div key={f.name} className={f.type === 'textarea' || f.type === 'json' ? 'sm:col-span-2' : ''}>
+            <div key={f.name} className={f.type === 'textarea' || f.type === 'json' || f.type === 'image' ? 'sm:col-span-2' : ''}>
               <FieldInput field={f} value={editing?.[f.name]} onChange={(v) => setEditing((prev) => ({ ...prev!, [f.name]: v }))} errors={errors} />
             </div>
           ))}

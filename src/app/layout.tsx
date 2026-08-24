@@ -1,12 +1,19 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Inter, Space_Grotesk } from 'next/font/google';
+import { Playfair_Display, Cinzel, Shippori_Mincho } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const spaceGrotesk = Space_Grotesk({
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair', display: 'swap' });
+const cinzel = Cinzel({
   subsets: ['latin'],
-  variable: '--font-space-grotesk',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-cinzel',
   display: 'swap',
+});
+const mincho = Shippori_Mincho({
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-mincho',
+  display: 'swap',
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -19,17 +26,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" data-theme="dark" className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('portfolio-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
-          }}
-        />
-      </head>
-      <body className="min-h-screen font-[Inter] antialiased text-slate-300">
-        {children}
-      </body>
+    <html lang="id" className={`${playfair.variable} ${cinzel.variable} ${mincho.variable}`} suppressHydrationWarning>
+      <head />
+      <body className="min-h-screen font-sans antialiased text-slate-300">{children}</body>
     </html>
   );
 }

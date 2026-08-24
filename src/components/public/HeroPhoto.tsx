@@ -1,22 +1,21 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import GlassLens from '@/components/public/GlassLens';
 
 interface HeroPhotoProps {
   photo: string | null;
   name: string;
-  badges?: string[];
+  role?: string;
 }
 
 /**
- * Premium animated profile photo:
- * - 3D tilt yang mengikuti kursor + glare spotlight
- * - Layer parallax (depth) pada elemen dekoratif
- * - Rotating orbit rings + dots
- * - Scanline sweep, vignette, HUD corner ticks
- * - Badge mengambang + sparkle + status bar
+ * Kartu potret hero — gaya editorial Izanami:
+ * bingkai dobel hairline + tick sudut HUD, label mono mikro,
+ * nama vertikal di sisi kanan (writing-mode vertical), plate kaca.
+ * Interaksi: tilt 3D halus mengikuti kursor + glare spotlight.
  */
-export default function HeroPhoto({ photo, name, badges = ['Fullstack', 'AI-Ready'] }: HeroPhotoProps) {
+export default function HeroPhoto({ photo, name, role }: HeroPhotoProps) {
   const stageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,7 +26,6 @@ export default function HeroPhoto({ photo, name, badges = ['Fullstack', 'AI-Read
 
     const frame = stage.querySelector<HTMLElement>('.hero-photo-frame');
     const glare = stage.querySelector<HTMLElement>('.hero-photo-glare');
-    const fx = stage.querySelector<HTMLElement>('.hero-photo-fx');
     let tx = 0, ty = 0, mx = 0, my = 0, raf = 0;
     let running = false;
     let stopTimer: ReturnType<typeof setTimeout> | undefined;
@@ -37,13 +35,12 @@ export default function HeroPhoto({ photo, name, badges = ['Fullstack', 'AI-Read
       tx += (mx - tx) * 0.09;
       ty += (my - ty) * 0.09;
       if (frame) {
-        frame.style.transform = `perspective(1000px) rotateX(${(-ty * 9).toFixed(2)}deg) rotateY(${(tx * 11).toFixed(2)}deg) scale(1.015)`;
+        frame.style.transform = `perspective(1000px) rotateX(${(-ty * 7).toFixed(2)}deg) rotateY(${(tx * 9).toFixed(2)}deg)`;
       }
       if (glare) {
         glare.style.opacity = `${Math.min(1, Math.abs(tx) + Math.abs(ty)).toFixed(2)}`;
-        glare.style.background = `radial-gradient(300px circle at ${(50 + tx * 28).toFixed(1)}% ${(50 + ty * 28).toFixed(1)}%, rgba(255,255,255,0.3), transparent 65%)`;
+        glare.style.background = `radial-gradient(300px circle at ${(50 + tx * 28).toFixed(1)}% ${(50 + ty * 28).toFixed(1)}%, rgba(255,255,255,0.22), transparent 65%)`;
       }
-      if (fx) fx.style.transform = `translate3d(${(tx * 16).toFixed(1)}px, ${(ty * 16).toFixed(1)}px, 0)`;
       raf = requestAnimationFrame(loop);
     };
 
@@ -67,7 +64,6 @@ export default function HeroPhoto({ photo, name, badges = ['Fullstack', 'AI-Read
         running = false;
         cancelAnimationFrame(raf);
         if (frame) frame.style.transform = '';
-        if (fx) fx.style.transform = '';
         if (glare) glare.style.opacity = '0';
       }, 800);
     };
@@ -89,57 +85,37 @@ export default function HeroPhoto({ photo, name, badges = ['Fullstack', 'AI-Read
   const initial = (name || 'F').charAt(0).toUpperCase();
 
   return (
-    <div className="hero-photo-wrap relative inline-block" ref={stageRef} data-parallax="0.07">
+    <div className="hero-photo-wrap group relative inline-block" ref={stageRef} data-parallax="0.07">
       <div className="hero-photo-fx">
-        <div className="hero-photo-glow" aria-hidden="true" />
+        <figure className="hero-photo-frame editorial-frame">
+          <span className="ef-label font-mono-accent">( Profile )</span>
 
-        <div className="hero-ring hr-1" aria-hidden="true" />
-        <div className="hero-ring hr-2" aria-hidden="true" />
-        <div className="hero-orbit-dots" aria-hidden="true">
-          <span className="hod hod-1" />
-          <span className="hod hod-2" />
-        </div>
-
-        <div className="hero-orb-badge hb-1">
-          <span className="hb-ic">🛠</span>
-          <span>{badges[0] ?? 'Fullstack'}</span>
-        </div>
-        <div className="hero-orb-badge hb-2">
-          <span className="hb-ic">⚡</span>
-          <span>{badges[1] ?? 'AI-Ready'}</span>
-        </div>
-
-        <span className="hero-spark hs-1" aria-hidden="true" />
-        <span className="hero-spark hs-2" aria-hidden="true" />
-        <span className="hero-spark hs-3" aria-hidden="true" />
-        <span className="hero-spark hs-4" aria-hidden="true" />
-
-        <div className="hero-photo-frame">
-          <div className="hero-photo-inner glass-card glow-ring animate-border">
+          <div className="hero-photo-inner grain grayscale contrast-[1.06] transition-[filter] duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100">
             {photo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={photo} alt={name} className="w-full h-full object-cover" />
+              <GlassLens src={photo} alt={name} priority sizes="(max-width: 1024px) 62vw, 330px" />
             ) : (
-              <div
-                className="w-full h-full flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, var(--p-primary), var(--p-secondary))' }}
-              >
-                <span className="text-6xl font-bold text-white" style={{ color: '#fff' }}>{initial}</span>
+              <div className="w-full h-full grid place-items-center bg-[#101013]">
+                <span className="font-serif italic text-8xl text-white/10 select-none">{initial}</span>
               </div>
             )}
+            <span className="tint-layer" aria-hidden="true" />
             <div className="hero-photo-glare" aria-hidden="true" />
-            <div className="hero-photo-scan" aria-hidden="true" />
             <div className="hero-photo-vignette" aria-hidden="true" />
-            <span className="hero-corner hc-tl" aria-hidden="true" />
-            <span className="hero-corner hc-tr" aria-hidden="true" />
-            <span className="hero-corner hc-bl" aria-hidden="true" />
-            <span className="hero-corner hc-br" aria-hidden="true" />
           </div>
-        </div>
 
-        <div className="hero-status">
-          <span className="hs-dot" aria-hidden="true" /> ONLINE <span className="hs-cursor" aria-hidden="true">▮</span>
-        </div>
+          {/* Plate kaca — senada kartu profil di section About */}
+          <figcaption className="profile-plate">
+            <span className="block font-serif text-lg text-white leading-snug">{name}</span>
+            <span className="plate-diamond" aria-hidden="true" />
+            {role && (
+              <span className="block font-mono-accent text-[10px] uppercase tracking-[0.32em] text-slate-400 mt-2">{role}</span>
+            )}
+          </figcaption>
+
+          {/* Teks vertikal cermin: nama kanan, kanji kiri */}
+          <span className="vside-label font-mono-accent" aria-hidden="true">{name || 'Portfolio'}</span>
+          <span className="vside-label vside-label--left vside-kanji" aria-hidden="true">私</span>
+        </figure>
       </div>
     </div>
   );

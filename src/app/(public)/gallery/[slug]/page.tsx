@@ -14,7 +14,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     .eq('is_active', true)
     .maybeSingle();
   if (!data) return { title: 'Gallery' };
-  return { title: data.title, description: data.description || undefined };
+  const image = mediaUrl(String(data.cover_image ?? ''));
+  return {
+    title: data.title,
+    description: data.description || undefined,
+    alternates: { canonical: `/gallery/${slug}` },
+    openGraph: {
+      title: data.title,
+      description: data.description || undefined,
+      url: `/gallery/${slug}`,
+      images: image ? [{ url: image, alt: data.title }] : undefined,
+    },
+  };
 }
 
 export default async function GalleryShowPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -35,13 +46,13 @@ export default async function GalleryShowPage({ params }: { params: Promise<{ sl
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <a href="/gallery" className="text-sm text-slate-400 hover:text-white transition-colors">← Kembali ke Gallery</a>
 
-        <h1 className="font-[Space_Grotesk] text-3xl md:text-5xl font-bold text-white mt-6" data-reveal>
+        <h1 className="font-display text-3xl md:text-5xl font-bold text-white mt-6" data-reveal>
           {gallery.title}
         </h1>
 
         <div className="flex flex-wrap gap-2 mt-4" data-reveal>
           {gallery.category && (
-            <span className="px-3 py-1 rounded-full text-xs text-cyan-400 bg-white/5">{gallery.category}</span>
+            <span className="font-mono-accent px-3 py-1 rounded-full text-xs text-slate-300 bg-white/5">{gallery.category}</span>
           )}
           {gallery.event_date && (
             <span className="px-3 py-1 rounded-full text-xs text-slate-400 bg-white/5">📅 {formatDate(gallery.event_date as string, 'dmy')}</span>

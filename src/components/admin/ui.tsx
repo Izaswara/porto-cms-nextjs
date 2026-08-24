@@ -101,7 +101,7 @@ export function PageHeader({ title, desc, actions }: { title: string; desc?: str
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
       <div>
-        <h1 className="font-[Space_Grotesk] text-2xl md:text-3xl font-bold text-white">{title}</h1>
+        <h1 className="font-display text-2xl md:text-3xl font-bold text-white">{title}</h1>
         {desc && <p className="text-slate-400 text-sm mt-1">{desc}</p>}
       </div>
       {actions && <div className="flex gap-2">{actions}</div>}

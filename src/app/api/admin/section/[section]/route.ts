@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { db } from '@/lib/db';
 import { getSessionFromRequest } from '@/lib/auth';
 
@@ -9,7 +10,7 @@ type SectionTable = 'hero_sections' | 'about_sections';
 const SECTION: Record<string, SectionTable | undefined> = { hero: 'hero_sections', about: 'about_sections' };
 const JSON_FIELDS: Record<string, string[]> = {
   hero_sections: ['typing_texts', 'buttons', 'social_media'],
-  about_sections: ['statistics', 'services', 'social_media'],
+  about_sections: ['statistics', 'skills'],
 };
 const BOOL_FIELDS: Record<string, string[]> = { hero_sections: ['is_active'], about_sections: ['is_active'] };
 
@@ -53,9 +54,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ sect
   if (existing) {
     const { data, error } = await db().from(table).update({ ...clean, updated_at: new Date().toISOString() }).eq('id', 1).select().single();
     if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    revalidateTag('content');
     return NextResponse.json({ data });
   }
   const { data, error } = await db().from(table).insert({ id: 1, ...clean }).select().single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  revalidateTag('content');
   return NextResponse.json({ data });
 }

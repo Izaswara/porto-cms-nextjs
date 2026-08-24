@@ -144,6 +144,32 @@ export const RESOURCE_SCHEMAS: Record<string, ResourceSchema> = {
     ],
     defaultNew: { is_active: true, sort_order: 0 },
   },
+  showcase: {
+    resource: 'showcase',
+    title: 'Showcase',
+    singular: 'Foto Showcase',
+    desc: 'Foto full-bleed untuk section tertentu',
+    columns: ['title', 'section_position', 'is_active', 'sort_order'],
+    fields: [
+      { name: 'title', label: 'Judul', type: 'text' },
+      { name: 'subtitle', label: 'Sub-judul', type: 'text' },
+      { name: 'image', label: 'Foto', type: 'image' },
+      {
+        name: 'section_position',
+        label: 'Posisi Section',
+        type: 'select',
+        options: [
+          { value: 'after_hero', label: 'Setelah Hero' },
+          { value: 'after_projects', label: 'Setelah Projects' },
+          { value: 'after_experience', label: 'Setelah Experience' },
+          { value: 'after_blog', label: 'Setelah Blog' },
+        ],
+      },
+      { name: 'is_active', label: 'Aktif', type: 'toggle' },
+      { name: 'sort_order', label: 'Urutan', type: 'number' },
+    ],
+    defaultNew: { is_active: true, sort_order: 0 },
+  },
   galleries: {
     resource: 'galleries',
     title: 'Galleries',

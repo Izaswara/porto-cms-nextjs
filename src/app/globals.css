@@ -1,69 +1,52 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-grotesk: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+/* Font token system ala Izanami:
+   Playfair Display (display), Cinzel (label/wayfinding), Shippori Mincho (body).
+   Token lama dipertahankan namanya supaya seluruh utility ikut berubah otomatis:
+   --font-mono-accent kini menunjuk Cinzel, --font-name/--font-display ke Playfair. */
+@theme inline {
+  --font-sans: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-name: var(--font-playfair), Georgia, serif;
+  --font-mono-accent: var(--font-cinzel), Georgia, serif;
+  --font-body-serif: var(--font-mincho), "Hiragino Mincho ProN", "Yu Mincho", serif;
 }
 
 :root {
-  --p-primary: #ff3333;
-  --p-secondary: #d90429;
-  --p-accent: #ff6b6b;
-}
-
-html[data-theme="light"] {
-  --app-bg: #fafafa;
-  --app-surface: #ffffff;
-  --app-text: #18181b;
-  --app-muted: #52525b;
-  --app-border: rgba(24, 24, 27, 0.1);
-  --app-glass: rgba(255, 255, 255, 0.75);
-  --app-navbar: rgba(255, 255, 255, 0.75);
-  --app-card-bg: rgba(255, 255, 255, 0.9);
-  --app-card-border: rgba(24, 24, 27, 0.08);
-  --app-link-hover: rgba(24, 24, 27, 0.05);
-  --app-footer-bg: rgba(250, 250, 250, 0.85);
-  --app-scrollbar-track: #f0f0f2;
-  --app-scrollbar-thumb: rgba(24, 24, 27, 0.25);
-}
-
-/* Light mode: depth â€” layered gradient mesh + elevation */
-html[data-theme="light"] body {
-  background:
-    radial-gradient(1100px 700px at 88% -12%, color-mix(in srgb, var(--p-primary) 8%, transparent) 0%, transparent 60%),
-    radial-gradient(900px 620px at -12% 28%, color-mix(in srgb, var(--p-secondary) 6%, transparent) 0%, transparent 62%),
-    radial-gradient(800px 600px at 55% 110%, color-mix(in srgb, var(--p-accent) 5%, transparent) 0%, transparent 65%),
-    linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
-}
-
-html[data-theme="light"] .glow-ring {
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--p-primary) 32%, transparent), 0 0 34px color-mix(in srgb, var(--p-primary) 22%, transparent);
-}
-
-html[data-theme="dark"] {
-  --app-bg: #0a0a0a;
-  --app-surface: #0d0d0d;
-  --app-text: #f4f4f5;
-  --app-muted: #a1a1aa;
-  --app-border: rgba(255, 255, 255, 0.08);
+  /* Palet Izanami — DIEKSTRAK DARI FOTO PROFIL:
+     bayangan #0e0e09–#241c0f, kulit tembaga #9e6c50/#975739, highlight hangat. */
+  --p-primary: #ffffff;
+  --p-secondary: #d4d4d4;
+  --p-accent: #cf7a52;
+  --tint-indigo: 99, 102, 241;
+  --tint-cyan: 34, 211, 238;
+  --tint-copper: 201, 122, 82;
+  --app-bg: #000000;
+  --app-surface: #050505;
+  --app-text: #ededed;
+  --app-muted: #8a8a8a;
+  --app-border: rgba(255, 255, 255, 0.14);
+  --hairline: rgba(255, 255, 255, 0.18);
   --app-glass: rgba(255, 255, 255, 0.03);
-  --app-navbar: rgba(10, 10, 10, 0.6);
-  --app-card-bg: rgba(255, 255, 255, 0.03);
-  --app-card-border: rgba(255, 255, 255, 0.07);
-  --app-link-hover: rgba(255, 255, 255, 0.05);
+  --app-navbar: rgba(0, 0, 0, 0.6);
+  --app-card-bg: rgba(255, 255, 255, 0.04);
+  --app-card-border: rgba(255, 255, 255, 0.1);
+  --app-link-hover: rgba(255, 255, 255, 0.06);
   --app-footer-bg: rgba(0, 0, 0, 0.5);
-  --app-scrollbar-track: #0a0a0a;
-  --app-scrollbar-thumb: rgba(161, 161, 170, 0.25);
-  --app-overlay: rgba(10, 10, 10, 0.96);
+  --app-scrollbar-track: #000000;
+  --app-scrollbar-thumb: rgba(255, 255, 255, 0.25);
+  --app-overlay: rgba(0, 0, 0, 0.96);
 }
 
-/* Dark mode: AI-futuristik depth — layered gradient mesh + nebula */
-html[data-theme="dark"] body {
+/* Depth: flat warm-black dengan nebula tembaga sangat halus */
+body {
   background:
-    radial-gradient(1200px 760px at 88% -12%, color-mix(in srgb, var(--p-primary) 9%, transparent) 0%, transparent 62%),
-    radial-gradient(980px 640px at -14% 28%, color-mix(in srgb, var(--p-secondary) 7%, transparent) 0%, transparent 64%),
-    radial-gradient(820px 620px at 54% 112%, color-mix(in srgb, var(--p-accent) 5%, transparent) 0%, transparent 68%),
-    linear-gradient(180deg, #05060d 0%, #070912 46%, #030409 100%);
+
+
+    #000000;
+  /* TANPA background-attachment:fixed — pola itu memaksa repaint penuh
+     tiap frame scroll = sumber utama scroll terasa berat. */
+  font-family: var(--font-mincho), "Hiragino Mincho ProN", "Yu Mincho", Georgia, serif;
 }
 
 * {
@@ -83,24 +66,22 @@ html {
 }
 
 body {
-  background: var(--app-bg);
   color: var(--app-text);
   overflow-x: hidden;
-  transition: background 0.6s ease, color 0.6s ease;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--app-scrollbar-track); }
-::-webkit-scrollbar-thumb { background: var(--app-scrollbar-thumb); border-radius: 6px; }
+::-webkit-scrollbar-thumb { background: var(--app-scrollbar-thumb); border-radius: 0; }
 
 /* Frosted glass navbar */
 .glass-navbar {
-  background: rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06), 0 8px 30px -20px rgba(0, 0, 0, 0.5);
+  background: rgba(10, 8, 1, 0.55);
+  border-bottom: 1px solid var(--hairline);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  box-shadow: none;
   transition: background 0.5s ease, box-shadow 0.5s ease;
 }
 
@@ -114,14 +95,6 @@ header#navbar.nav-hide {
   transform: translateY(-100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-}
-
-html[data-theme="dark"] .glass-navbar { background: rgba(10, 12, 20, 0.55); }
-html[data-theme="light"] header#navbar {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.82));
-  border-bottom-color: rgba(24, 24, 27, 0.08);
-  backdrop-filter: blur(28px) saturate(180%);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 12px 34px -18px rgba(24, 24, 27, 0.25);
 }
 
 /* Glass round icon buttons */
@@ -140,10 +113,7 @@ html[data-theme="light"] header#navbar {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 24px -10px color-mix(in srgb, var(--p-primary) 50%, transparent);
 }
 
-html[data-theme="light"] .glass-btn {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 4px 16px -10px rgba(20, 20, 60, 0.25);
-}
+
 
 /* Back-to-top */
 #back-to-top {
@@ -187,11 +157,7 @@ html[data-theme="light"] .glass-btn {
   color: var(--p-accent);
 }
 
-html[data-theme="light"] #back-to-top {
-  color: #3a3a52;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.6));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 4px 16px -10px rgba(20, 20, 60, 0.25);
-}
+
 
 @media (prefers-reduced-motion: reduce) {
   #back-to-top { transition: none; }
@@ -276,7 +242,7 @@ html[data-theme="light"] #back-to-top {
 .hud-inline {
   align-items: center;
   gap: 12px;
-  font-family: "Space Grotesk", monospace;
+  font-family: var(--font-mono-accent);
   font-size: 10px;
   letter-spacing: 0.16em;
   line-height: 1;
@@ -333,32 +299,18 @@ html[data-theme="light"] #back-to-top {
   font-variant-numeric: tabular-nums;
 }
 
-html[data-theme="light"] .hud-inline { color: rgba(24, 24, 27, 0.7); }
-html[data-theme="light"] .hud-inline .hud-time { color: var(--app-text); }
-html[data-theme="light"] .hud-inline .hud-line,
-html[data-theme="light"] .hud-inline .hud-sub,
-html[data-theme="light"] .hud-inline .hud-row { color: rgba(24, 24, 27, 0.55); }
 
-html[data-theme="dark"] .glass-card {
+
+
+
+.glass-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 45%, rgba(255, 255, 255, 0.015) 100%);
   border-color: rgba(255, 255, 255, 0.13);
 }
 
-html[data-theme="light"] .glass-card {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.82) 55%, rgba(248, 248, 250, 0.94) 100%);
-  border: 1px solid rgba(24, 24, 27, 0.09);
-  box-shadow:
-    0 1px 2px -1px rgba(24, 24, 27, 0.08),
-    0 14px 34px -14px rgba(24, 24, 27, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
-}
 
-html[data-theme="light"] .glass-card:hover {
-  box-shadow:
-    0 2px 4px -2px rgba(24, 24, 27, 0.1),
-    0 22px 48px -18px rgba(24, 24, 27, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
-}
+
+
 
 /* Reveal animations */
 .yo-reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.9s cubic-bezier(0.22, 0.61, 0.36, 1), transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1); }
@@ -378,563 +330,31 @@ html[data-theme="light"] .glass-card:hover {
 .yo-btn:active { transform: translateY(0) scale(0.97); }
 
 .text-gradient {
-  background: linear-gradient(135deg, var(--p-primary), var(--p-secondary));
+  background: linear-gradient(
+    110deg,
+    rgb(var(--tint-cyan)) 0%,
+    #f5ede2 38%,
+    rgb(var(--tint-indigo)) 68%,
+    rgb(var(--tint-copper)) 100%
+  );
+  background-size: 220% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradientShift 8s ease-in-out infinite;
+  animation: bwShimmer 9s ease-in-out infinite;
 }
 
-@keyframes gradientShift {
-  0%, 100% { filter: hue-rotate(0deg); }
-  50% { filter: hue-rotate(25deg); }
+@keyframes bwShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
-.glow-ring { box-shadow: 0 0 0 1px color-mix(in srgb, var(--p-primary) 30%, transparent), 0 0 40px color-mix(in srgb, var(--p-primary) 25%, transparent); }
-
-/* Preloader */
-#preloader {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--p-primary) 10%, transparent) 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 90%, color-mix(in srgb, var(--p-secondary) 8%, transparent) 0%, transparent 60%),
-    radial-gradient(ellipse at center, #0a0d14 0%, #05060a 75%);
-  transition: opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0.7s ease, transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-#preloader.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: scale(1.04) translateY(-12px);
-}
-
-/* Matikan semua animasi preloader saat hidden agar tidak membebani CPU/GPU */
-#preloader.hidden,
-#preloader.hidden * {
-  animation: none !important;
-}
-
-.loader-ring {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  position: relative;
-  background: conic-gradient(from 0deg, transparent 0%, var(--p-primary) 30%, var(--p-secondary) 60%, transparent 100%);
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
-  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
-  animation: spin 1s linear infinite;
-}
-
-.loader-ring::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: conic-gradient(from 180deg, transparent 0%, #fff 20%, transparent 45%);
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
-  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
-  opacity: 0.55;
-  animation: spin 1.4s linear infinite reverse;
-}
-
-.loader-core {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle at 35% 35%, var(--p-primary), var(--p-secondary));
-  box-shadow: 0 0 40px var(--p-primary);
-  animation: pulse 1.2s ease-in-out infinite;
-}
-
-.loader-text {
-  font-family: "Space Grotesk", sans-serif;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  font-size: 0.72rem;
-}
-
-/* Karakter "LOADING": boot-up berurutan + glow neon yang seirama sama latar video */
-.loader-char {
-  display: inline-block;
-  background: linear-gradient(135deg, var(--p-primary) 0%, var(--p-secondary) 60%, var(--p-accent) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  opacity: 0;
-  animation:
-    loaderCharBoot 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards,
-    loaderCharNeon 2.4s ease-in-out infinite backwards;
-  animation-delay: calc(var(--i) * 0.09s), calc(var(--i) * 0.09s + 0.75s);
-}
-
-@keyframes loaderCharBoot {
-  0% { opacity: 0; transform: translateY(10px) scale(0.8); }
-  55% { opacity: 1; transform: translateY(0) scale(1.1); }
-  72% { opacity: 0.4; }
-  88% { opacity: 1; }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes loaderCharNeon {
-  0%, 100% { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--p-primary) 50%, transparent)); }
-  50% { filter: drop-shadow(0 0 12px color-mix(in srgb, var(--p-accent) 85%, transparent)); }
-}
-
-.loader-anime {
-  font-family: "Space Grotesk", sans-serif;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  font-size: 0.6rem;
-  color: var(--p-secondary);
-  opacity: 0.8;
-  animation: loaderAnimeGlow 2.4s ease-in-out infinite;
-}
-
-@keyframes loaderAnimeGlow {
-  0%, 100% { opacity: 0.35; letter-spacing: 0.25em; }
-  50% { opacity: 1; letter-spacing: 0.4em; text-shadow: 0 0 18px var(--p-secondary); }
-}
-
-.loader-bar {
-  position: relative;
-  width: 180px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  overflow: visible;
-}
-
-.loader-bar span {
-  display: block;
-  height: 100%;
-  width: 100%;
-  border-radius: 4px;
-  background: linear-gradient(90deg, var(--p-primary), var(--p-secondary));
-  box-shadow: 0 0 12px var(--p-primary);
-  animation: loadBar 1.4s ease forwards;
-  transform-origin: left;
-  animation-name: loadBar;
-}
-
-@keyframes loadBar {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-.loader-pct {
-  position: absolute;
-  top: -22px;
-  right: 0;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.15em;
-  color: var(--p-secondary);
-  font-style: normal;
-}
-
-/* Premium name display */
-.loader-name {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.15rem, 4.5vw, 2rem);
-  font-weight: 700;
-  text-transform: uppercase;
-  text-align: center;
-  background: linear-gradient(135deg, #fff 0%, var(--p-primary) 45%, var(--p-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  white-space: nowrap;
-  line-height: 1.2;
-}
-
-.loader-name-letter {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(24px) scale(0.7);
-  filter: blur(6px);
-  animation: nameLetterIn 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-
-.loader-name-letter.space { width: 0.4em; }
-
-@keyframes nameLetterIn {
-  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
-
-html[data-theme="light"] .loader-name {
-  background: linear-gradient(135deg, #1a1a35 0%, var(--p-primary) 55%, var(--p-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Anime-style speed-line bursts flanking the core */
-.loader-speed {
-  position: absolute;
-  top: 50%;
-  width: 300px;
-  height: 2px;
-  opacity: 0;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--p-primary) 70%, transparent));
-  transform-origin: center;
-  pointer-events: none;
-}
-
-.loader-speed.l { left: -260px; transform: translateY(-50%); }
-.loader-speed.r { right: -260px; transform: translateY(-50%) scaleX(-1); }
-
-#preloader.charging .loader-speed.l { animation: speedRayL 1.1s ease-in-out infinite; }
-#preloader.charging .loader-speed.r { animation: speedRayR 1.1s ease-in-out infinite; }
-
-@keyframes speedRayL {
-  0% { opacity: 0; transform: translateY(-50%) translateX(0) scaleX(0.4); }
-  50% { opacity: 1; transform: translateY(-50%) translateX(-40px) scaleX(1); }
-  100% { opacity: 0; transform: translateY(-50%) translateX(-90px) scaleX(0.6); }
-}
-
-@keyframes speedRayR {
-  0% { opacity: 0; transform: translateY(-50%) scaleX(-1) translateX(0) scaleX(0.4); }
-  50% { opacity: 1; transform: translateY(-50%) scaleX(-1) translateX(-40px) scaleX(1); }
-  100% { opacity: 0; transform: translateY(-50%) scaleX(-1) translateX(-90px) scaleX(0.6); }
-}
-
-/* Emblem fractal rings (anime magic circle) */
-.loader-emblem {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 220px;
-  height: 220px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  opacity: 0;
-}
-
-#preloader.charging .loader-emblem { animation: emblemFade 2.4s ease-in-out infinite; }
-
-.loader-emblem circle {
-  fill: none;
-  stroke-width: 1.2;
-  stroke-dasharray: 4 6;
-}
-
-.loader-emblem .em-1 { stroke: var(--p-primary); animation: spin 9s linear infinite; transform-origin: 110px 110px; }
-.loader-emblem .em-2 { stroke: var(--p-secondary); animation: spinReverse 13s linear infinite; transform-origin: 110px 110px; }
-.loader-emblem .em-3 { stroke: var(--p-accent); animation: spin 7s linear infinite; transform-origin: 110px 110px; }
-
-@keyframes spinReverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
-@keyframes emblemFade {
-  0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
-  50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
-}
-
-/* Fallen petal / sparkle particles behind the ring */
-.loader-particle-wrap { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-
-.loader-particle {
-  position: absolute;
-  border-radius: 50%;
-  background: var(--p-accent);
-  box-shadow: 0 0 8px var(--p-accent);
-  animation: loaderParticle 2.2s ease-in-out infinite;
-}
-
-@keyframes loaderParticle {
-  0% { opacity: 0; transform: translateY(0) scale(0.4); }
-  50% { opacity: 0.9; transform: translateY(-40px) scale(1); }
-  100% { opacity: 0; transform: translateY(-80px) scale(0.6); }
+.glow-ring {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--app-text) 22%, transparent),
+    0 24px 60px -30px rgba(0, 0, 0, 0.65);
 }
 
-/* Japanese tagline that types in */
-.loader-ja {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  color: rgba(255, 255, 255, 0.5);
-  text-align: center;
-  max-width: 70%;
-  line-height: 1.7;
-}
-
-.loader-ja .ja-cursor {
-  display: inline-block;
-  width: 2px;
-  height: 0.9em;
-  background: var(--p-accent);
-  vertical-align: -2px;
-  animation: blinkText 0.8s steps(2) infinite;
-}
-
-@keyframes blinkText {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
-}
-
-html[data-theme="light"] .loader-ja { color: var(--app-muted); }
-html[data-theme="light"] .loader-particle { background: var(--p-primary); box-shadow: 0 0 8px color-mix(in srgb, var(--p-primary) 55%, transparent); }
-
-/* ===== Light theme: preloader ===== */
-html[data-theme="light"] #preloader {
-  background:
-    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--p-primary) 9%, transparent) 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 90%, color-mix(in srgb, var(--p-secondary) 7%, transparent) 0%, transparent 60%),
-    radial-gradient(ellipse at center, #ffffff 0%, #f2f2f4 75%);
-}
-
-.loader-phase {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.62rem;
-  letter-spacing: 0.25em;
-  color: rgba(255, 255, 255, 0.6);
-  font-family: "Space Grotesk", sans-serif;
-}
-
-html[data-theme="light"] .loader-phase { color: var(--app-muted); }
-
-.loader-star {
-  position: absolute;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.7);
-  animation: loaderStarTwinkle 3s ease-in-out infinite;
-}
-
-html[data-theme="light"] .loader-star {
-  background: var(--p-primary);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--p-primary) 55%, transparent);
-}
-
-@keyframes loaderStarTwinkle {
-  0%, 100% { opacity: 0.2; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.15); }
-}
-
-html[data-theme="light"] .loader-bar { background: rgba(24, 24, 27, 0.1); }
-
-html[data-theme="light"] .loader-ring::after {
-  background: conic-gradient(from 180deg, transparent 0%, rgba(24, 24, 27, 0.4) 20%, transparent 45%);
-}
-
-.loader-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.4;
-  animation: loaderOrbFloat 9s ease-in-out infinite;
-}
-
-@keyframes loaderOrbFloat {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(40px, -30px) scale(1.15); }
-  66% { transform: translate(-30px, 25px) scale(0.9); }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.85; }
-}
-
-/* Custom cursor */
-.cursor-dot,
-.cursor-ring {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9998;
-  border-radius: 50%;
-  top: 0;
-  left: 0;
-}
-
-.cursor-dot {
-  width: 6px;
-  height: 6px;
-  background: #fff;
-  mix-blend-mode: difference;
-  transform: translate(-50%, -50%);
-  transition: transform 0.1s ease;
-}
-
-.cursor-ring {
-  width: 34px;
-  height: 34px;
-  background: #fff;
-  border: 1.5px solid #fff;
-  mix-blend-mode: difference;
-  transform: translate(-50%, -50%);
-  transition: width 0.25s ease, height 0.25s ease;
-}
-
-.cursor-ring.hover {
-  width: 56px;
-  height: 56px;
-}
-
-@media (pointer: coarse) {
-  .cursor-dot, .cursor-ring { display: none; }
-}
-
-/* Scroll progress */
-#scroll-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
-  width: 100%;
-  z-index: 90;
-  transform-origin: left;
-  background: linear-gradient(90deg, var(--p-primary), var(--p-secondary), var(--p-accent));
-  transform: scaleX(0);
-  pointer-events: none;
-}
-
-/* Speed energy line: bereaksi hanya pada kecepatan scroll, tanpa blur */
-#speed-line {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  z-index: 60;
-  transform-origin: center;
-  transform: scaleX(0);
-  opacity: 0;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, var(--p-primary) 28%, var(--p-accent) 50%, var(--p-primary) 72%, transparent);
-  box-shadow: 0 0 14px var(--p-primary), 0 0 4px color-mix(in srgb, var(--p-accent) 60%, transparent);
-  transition: opacity 0.5s ease;
-}
-
-/* Depth fade untuk section saat scroll (dipromosikan otomatis saat animasi berjalan) */
-
-/* Particles canvas */
-#particles {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* AI site overlay: dot-matrix + scanline CRT (murah, transform-only) */
-.ai-site-grid {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-  background-size: 26px 26px;
-}
-.ai-site-scan {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 130px;
-  z-index: 4;
-  pointer-events: none;
-  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--p-primary) 3.5%, transparent) 50%, transparent 100%);
-  animation: siteScan 14s linear infinite;
-}
-@keyframes siteScan {
-  from { transform: translateY(-140px); }
-  to { transform: translateY(100vh); }
-}
-html[data-theme="light"] .ai-site-grid {
-  background-image: radial-gradient(rgba(24, 24, 27, 0.045) 1px, transparent 1px);
-}
-
-/* Aurora ambient: blob cahaya yang drift pelan (transform-only) */
-.ai-aurora {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-.ai-aurora span {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(110px);
-  will-change: transform;
-}
-.ai-aurora .aa-1 {
-  width: 46vw;
-  height: 46vw;
-  left: -14vw;
-  top: -16vw;
-  background: color-mix(in srgb, var(--p-primary) 20%, transparent);
-  animation: auroraDrift 28s ease-in-out infinite alternate;
-}
-.ai-aurora .aa-2 {
-  width: 42vw;
-  height: 42vw;
-  right: -12vw;
-  top: 26vh;
-  background: color-mix(in srgb, var(--p-secondary) 15%, transparent);
-  animation: auroraDrift 34s ease-in-out -9s infinite alternate-reverse;
-}
-.ai-aurora .aa-3 {
-  width: 36vw;
-  height: 36vw;
-  left: 30vw;
-  bottom: -14vw;
-  background: color-mix(in srgb, var(--p-accent) 11%, transparent);
-  animation: auroraDrift 40s ease-in-out -18s infinite alternate;
-}
-@keyframes auroraDrift {
-  0% { transform: translate3d(0, 0, 0) scale(1); }
-  100% { transform: translate3d(8vw, -6vh, 0) scale(1.14); }
-}
-html[data-theme="light"] .ai-aurora span { opacity: 0.35; }
-
-/* Shooting stars: hujan bintang tipis melintas pelan (transform-only, murah) */
-.shooting-stars {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  overflow: hidden;
-}
-.shooting-stars i {
-  position: absolute;
-  top: -5%;
-  width: 90px;
-  height: 1.5px;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9));
-  box-shadow: 0 0 8px 1px color-mix(in srgb, var(--p-primary) 55%, transparent);
-  opacity: 0;
-  animation: shootStar var(--ss-dur, 12s) linear var(--ss-delay, 0s) infinite;
-}
-@keyframes shootStar {
-  0% { transform: translate3d(0, 0, 0) rotate(35deg); opacity: 0; }
-  3% { opacity: 0.85; }
-  10% { transform: translate3d(var(--ss-x, 55vw), var(--ss-y, 35vh), 0) rotate(35deg); opacity: 0.85; }
-  13%, 100% { transform: translate3d(var(--ss-x, 55vw), var(--ss-y, 35vh), 0) rotate(35deg); opacity: 0; }
-}
-.shooting-stars .ss-1 { left: 12%; --ss-x: 55vw; --ss-y: 34vh; --ss-dur: 11s; --ss-delay: 0s; }
-.shooting-stars .ss-2 { left: 45%; --ss-x: 48vw; --ss-y: 40vh; --ss-dur: 14s; --ss-delay: 4.5s; }
-.shooting-stars .ss-3 { left: 72%; --ss-x: 38vw; --ss-y: 30vh; --ss-dur: 17s; --ss-delay: 9s; }
 
 /* Orbs, blobs, cube, orbital rings for hero */
 .orb {
@@ -1074,37 +494,14 @@ html[data-theme="light"] .ai-aurora span { opacity: 0.35; }
   50% { transform: translateY(-7px); }
 }
 
-/* Glitch */
-.glitch { position: relative; }
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  opacity: 0.7;
-  clip-path: inset(0);
-  pointer-events: none;
-}
-.glitch::before { color: var(--p-secondary); animation: glitchShift 3s infinite linear alternate-reverse; }
-.glitch::after { color: var(--p-accent); animation: glitchShift 2s infinite linear alternate; }
-
-@keyframes glitchShift {
-  0% { clip-path: inset(0 0 92% 0); transform: translate(-2px, -1px); }
-  25% { clip-path: inset(35% 0 45% 0); transform: translate(2px, 1px); }
-  50% { clip-path: inset(70% 0 15% 0); transform: translate(-1px, 2px); }
-  75% { clip-path: inset(10% 0 80% 0); transform: translate(1px, -2px); }
-  100% { clip-path: inset(50% 0 30% 0); transform: translate(0, 0); }
-}
-
 /* Neural mobile menu */
 #neural-menu {
   position: fixed;
   inset: 0;
   z-index: 60;
   background:
-    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--p-primary) 12%, transparent) 0%, rgba(5, 6, 10, 0.97) 55%),
-    radial-gradient(ellipse at 80% 90%, color-mix(in srgb, var(--p-secondary) 10%, transparent) 0%, transparent 60%),
-    #05060a;
+    radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.97) 55%),
+    #000000;
   opacity: 0;
   visibility: hidden;
   clip-path: circle(0% at 82% 6%);
@@ -1232,9 +629,10 @@ html[data-theme="light"] .ai-aurora span { opacity: 0.35; }
 }
 
 .neural-head {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.4rem;
-  letter-spacing: 0.3em;
+  font-family: var(--font-mono-accent);
+  font-size: 0.85rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
   color: var(--app-text);
   display: flex;
   gap: 0.5rem;
@@ -1322,13 +720,19 @@ html[data-theme="light"] .ai-aurora span { opacity: 0.35; }
 }
 
 .neural-idx {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-cinzel);
   font-size: 0.7rem;
-  color: var(--p-primary);
-  letter-spacing: 0.15em;
+  color: var(--p-secondary);
+  letter-spacing: 0.2em;
 }
 
-.neural-name { font-weight: 600; font-size: 1.05rem; flex: 1; }
+.neural-name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  line-height: 1.1;
+  flex: 1;
+}
 .neural-arrow { color: var(--p-secondary); opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
 .neural-link:hover .neural-arrow { opacity: 1; transform: translateX(4px); }
 
@@ -1350,27 +754,26 @@ html[data-theme="light"] .ai-aurora span { opacity: 0.35; }
 
 .neural-close {
   position: absolute;
-  top: 1.1rem;
-  right: 1.1rem;
+  /* Persis di kotak tombol MENU di header: container header pt-8 (2rem),
+     sisi kanan px-6 (mobile) / sm:px-12 (desktop). Tanpa padding supaya
+     teks CLOSE menempati piksel yang sama dengan MENU — tombol terasa
+     tidak pernah pindah tempat. */
+  top: 2rem;
+  right: 1.5rem;
   z-index: 10;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.6);
+  padding: 0;
+  color: rgba(255, 255, 255, 0.9);
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1), background 0.3s ease, color 0.3s ease;
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1), color 0.3s ease;
 }
 
-.neural-close:hover { background: rgba(255, 255, 255, 0.24); color: #fff; }
+@media (min-width: 640px) {
+  .neural-close { right: 3rem; }
+}
 
-.neural-close svg { width: 1.15rem; height: 1.15rem; }
+.neural-close:hover { color: #fff; opacity: 0.6; }
 
 #neural-menu.closing .neural-close {
   opacity: 0;
@@ -1386,8 +789,10 @@ html[data-theme="light"] .ai-aurora span { opacity: 0.35; }
   display: flex;
   justify-content: space-between;
   padding: 0 2rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
+  font-family: var(--font-mono-accent);
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
   color: rgba(255, 255, 255, 0.35);
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
@@ -1401,41 +806,19 @@ html[data-theme="light"] .ai-aurora span { opacity: 0.35; }
 .neural-status { color: #22c55e; }
 
 /* ===== Light theme: neural mobile menu ===== */
-html[data-theme="light"] #neural-menu {
-  background:
-    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--p-primary) 12%, transparent) 0%, rgba(250, 250, 250, 0.98) 55%),
-    radial-gradient(ellipse at 80% 90%, color-mix(in srgb, var(--p-secondary) 8%, transparent) 0%, transparent 60%),
-    #fafafa;
-}
 
-html[data-theme="light"] .neural-grid {
-  background-image: linear-gradient(rgba(24, 24, 27, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(24, 24, 27, 0.05) 1px, transparent 1px);
-}
 
-html[data-theme="light"] .neural-link {
-  border-color: rgba(24, 24, 27, 0.12);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5));
-  box-shadow: 0 8px 24px -14px rgba(20, 20, 60, 0.18);
-}
 
-html[data-theme="light"] .neural-link:hover {
-  border-color: color-mix(in srgb, var(--p-primary) 60%, transparent);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));
-}
 
-html[data-theme="light"] .neural-foot { color: rgba(24, 24, 27, 0.45); }
 
-html[data-theme="light"] .neural-close {
-  color: #18181b;
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(24, 24, 27, 0.22);
-  box-shadow: 0 8px 24px -10px rgba(20, 20, 60, 0.18);
-}
 
-html[data-theme="light"] .neural-close:hover {
-  background: #ffffff;
-  color: #18181b;
-}
+
+
+
+
+
+
+
 
 /* Mobile hamburger morph ke X */
 .mobile-burger .mb-line {
@@ -1464,196 +847,31 @@ header#navbar.nav-scrolled {
   box-shadow: 0 12px 40px -18px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Cinema scene — stage di-pin via JS (fixed saat scroll di dalam scene) */
-#scroll-scene { height: 520vh; position: relative; }
-.scene-stage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100vh;
-  overflow: hidden;
-  background: radial-gradient(ellipse at 50% 40%, #1a0710 0%, #0a0510 45%, #05060a 100%);
-  will-change: top;
-}
+/* Light mode refinements — netral murni, tanpa tint warna */
 
-.scene-stage { position: absolute; inset: 0; }
 
-.cinema-frame { position: absolute; inset: 0; overflow: hidden; }
-.cinema-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1.18);
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
 
-.cinema-vignette {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.75) 100%);
-  pointer-events: none;
-}
 
-.cinema-glow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 60%, color-mix(in srgb, var(--p-primary) 35%, transparent) 0%, transparent 60%);
-  opacity: 0;
-  pointer-events: none;
-}
 
-.cinema-embers { position: absolute; inset: 0; pointer-events: none; }
-.ce-particle {
-  position: absolute;
-  bottom: 0;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--p-primary), var(--p-accent));
-  box-shadow: 0 0 12px var(--p-primary);
-  opacity: 0;
-}
 
-.cinema-loading {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-  z-index: 2;
-}
 
-.cinema-loading.show { opacity: 1; visibility: visible; }
 
-.cinema-loading-spinner {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.14);
-  border-top-color: var(--p-primary);
-  animation: spin 0.9s linear infinite;
-}
-
-.cinema-loading-text {
-  font-size: 0.72rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  animation: loadPulse 1.6s ease-in-out infinite;
-}
-
-@keyframes loadPulse {
-  0%, 100% { opacity: 0.45; }
-  50% { opacity: 1; }
-}
-
-.cinema-fallback {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.5s ease;
-}
-
-.cinema-fallback.show { opacity: 1; visibility: visible; }
-
-.cf-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(70px);
-  animation: orbFloat 10s ease-in-out infinite;
-}
-
-.cf-orb-1 { width: 380px; height: 380px; background: var(--p-primary); opacity: 0.3; top: 20%; left: 20%; }
-.cf-orb-2 { width: 300px; height: 300px; background: var(--p-secondary); opacity: 0.25; bottom: 20%; right: 20%; animation-delay: -4s; }
-
-.cf-core {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, var(--p-primary), var(--p-secondary));
-  box-shadow: 0 0 60px var(--p-primary);
-  animation: pulseCore 2s ease-in-out infinite;
-}
-
-@keyframes pulseCore {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.15); opacity: 1; }
-}
-
-.cf-text { color: rgba(255, 255, 255, 0.5); font-size: 0.8rem; }
-
-.scene-text { position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; }
-.chapter {
-  position: absolute;
-  text-align: center;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(2rem, 6vw, 4.5rem);
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 0 40px color-mix(in srgb, var(--p-primary) 60%, transparent);
-  transition: all 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-.chapter p { font-size: 1rem; font-weight: 400; color: rgba(255, 255, 255, 0.6); letter-spacing: 0.1em; margin-top: 0.5rem; }
-
-html[data-theme="light"] .chapter {
-  color: var(--app-text);
-  text-shadow: 0 0 40px color-mix(in srgb, var(--p-primary) 25%, transparent);
-}
-
-html[data-theme="light"] .chapter p { color: var(--app-muted); }
-
-/* Light mode refinements */
-html[data-theme="light"] .text-slate-300 { color: #3a3a52; }
-html[data-theme="light"] .text-slate-200 { color: #3a3a52; }
-html[data-theme="light"] .text-slate-400 { color: var(--app-muted); }
-html[data-theme="light"] .text-slate-500 { color: #7a7a92; }
-html[data-theme="light"] .text-slate-600 { color: #71717a; }
-html[data-theme="light"] .text-cyan-300,
-html[data-theme="light"] .text-cyan-400 { color: #0d8aa8; }
-html[data-theme="light"] .text-white { color: var(--app-text); }
-html[data-theme="light"] .bg-white\/5,
-html[data-theme="light"] .bg-white\/\[\.03\] { background: rgba(20, 20, 60, 0.03); }
-html[data-theme="light"] .border-white\/10,
-html[data-theme="light"] .border-white\/5 { border-color: var(--app-border); }
 
 /* Variant state: hover/group-hover harus ikut menyesuaikan tema */
-html[data-theme="light"] .hover\:text-white:hover { color: var(--app-text); }
-html[data-theme="light"] .hover\:bg-white\/5:hover { background: rgba(24, 24, 27, 0.05); }
-html[data-theme="light"] .group:hover .group-hover\:text-cyan-300,
-html[data-theme="light"] .group:hover .group-hover\:text-cyan-400 { color: #0d8aa8; }
-html[data-theme="light"] .border-white\/15 { border-color: var(--app-border); }
 
-/* Tombol dengan background gradient tetap harus teks putih di light mode */
-html[data-theme="light"] .text-white[style*="linear-gradient"] { color: #fff; }
 
-/* Overlay gelap (Lightbox & CV modal) tetap gelap di light mode â€” kontennya harus tetap terang */
-html[data-theme="light"] .bg-black\/90 .text-slate-300 { color: #cbd5e1; }
-html[data-theme="light"] .bg-black\/90 .text-slate-400 { color: #94a3b8; }
-html[data-theme="light"] .bg-black\/90 .text-slate-500 { color: #64748b; }
-html[data-theme="light"] .bg-black\/90 .text-white { color: #fff; }
-html[data-theme="light"] .bg-black\/90 .hover\:text-white:hover { color: #fff; }
-html[data-theme="light"] .text-white.bg-black\/30 { color: #fff; }
+
+
+/* Overlay gelap (Lightbox & CV modal) tetap gelap di light mode — kontennya harus tetap terang */
+
+
+
+
+
+
 
 /* Footer: glass terang yang konsisten dengan navbar */
-html[data-theme="light"] footer.glass-navbar {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(250, 250, 250, 0.66));
-  border-bottom-color: rgba(24, 24, 27, 0.08);
-  backdrop-filter: blur(28px) saturate(180%);
-  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.7), 0 -12px 34px -18px rgba(24, 24, 27, 0.18);
-}
+
 
 /* Footer social: hover melompat + glow */
 footer a svg { transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1), color 0.3s ease, filter 0.3s ease; }
@@ -1670,11 +888,11 @@ footer a:hover svg {
   60% { transform: translateY(-2px) rotate(6deg); }
 }
 
-/* Hero background pattern (dots & grid) â€” terlihat juga di light mode */
+/* Hero background pattern (dots & grid) — terlihat juga di light mode */
 .hero-dots { background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 32px 32px; }
 .hero-grid { background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 72px 72px; }
-html[data-theme="light"] .hero-dots { background-image: radial-gradient(rgba(24, 24, 27, 0.07) 1px, transparent 1px); }
-html[data-theme="light"] .hero-grid { background-image: linear-gradient(rgba(24, 24, 27, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(24, 24, 27, 0.05) 1px, transparent 1px); }
+
+
 
 /* ===== AI Futuristik backdrop: neural network ===== */
 .ai-neural {
@@ -1845,33 +1063,11 @@ html[data-theme="light"] .hero-grid { background-image: linear-gradient(rgba(24,
 }
 
 /* Light mode adjustments */
-html[data-theme="light"] .ai-neural { opacity: 0.35; }
-html[data-theme="light"] .ai-holo { opacity: 0.5; }
-html[data-theme="light"] .ai-data-cube { opacity: 0.7; }
-html[data-theme="light"] .ai-floor::before {
-  background-image:
-    linear-gradient(rgba(24, 24, 27, 0.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(24, 24, 27, 0.11) 1px, transparent 1px);
-}
-html[data-theme="light"] .ai-vignette {
-  background: radial-gradient(ellipse at center, transparent 58%, rgba(24, 24, 27, 0.12) 100%);
-}
 
-/* ===== Cinema scene: tetap terbaca di light mode ===== */
-html[data-theme="light"] .scene-stage {
-  background: radial-gradient(ellipse at 50% 40%, #ffe4e6 0%, #fecaca 45%, #f5f5f7 100%);
-}
-html[data-theme="light"] .cinema-vignette {
-  background: radial-gradient(ellipse at center, transparent 42%, rgba(24, 24, 27, 0.3) 100%);
-}
-html[data-theme="light"] .cf-text { color: rgba(24, 24, 27, 0.65); }
 
-html[data-theme="light"] .cinema-loading-spinner {
-  border-color: rgba(24, 24, 27, 0.12);
-  border-top-color: var(--p-primary);
-}
 
-html[data-theme="light"] .cinema-loading-text { color: rgba(24, 24, 27, 0.55); }
+
+
 
 /* ===== Hero entrance ===== */
 .fade-up {
@@ -1888,68 +1084,30 @@ html[data-theme="light"] .cinema-loading-text { color: rgba(24, 24, 27, 0.55); }
   will-change: transform, opacity;
 }
 
-/* ===== Section heading: scramble reveal + energy beam ===== */
-.sh-char {
-  display: inline-block;
-  min-width: 1ch;
-  text-align: center;
-}
-
-.section-heading {
-  display: inline-block;
-  position: relative;
-}
-
-.sh-beam {
-  display: block;
-  width: 90px;
-  height: 2px;
-  margin: -0.75rem auto 0.25rem;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, transparent, var(--p-secondary), var(--p-accent), transparent);
-  background-size: 200% 100%;
-  opacity: 0;
-  transform: scaleX(0);
-  transform-origin: center;
-  box-shadow: 0 0 12px color-mix(in srgb, var(--p-secondary) 60%, transparent);
-  transition: opacity 0.5s ease, transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-.section-heading + .sh-beam {
-  animation: shBeamDraw 1.1s cubic-bezier(0.19, 1, 0.22, 1) 0.9s backwards, shBeamPulse 4s ease-in-out 2.6s infinite;
-}
-
-@keyframes shBeamDraw {
-  from { opacity: 0; transform: scaleX(0); }
-  40% { opacity: 1; }
-  to { opacity: 1; transform: scaleX(1); }
-}
-
-@keyframes shBeamPulse {
-  0%, 100% { opacity: 0.55; transform: scaleX(1); }
-  50% { opacity: 1; transform: scaleX(1.06); }
-}
-
-/* ===== Hero name: futuristic letter reveal + holo shimmer ===== */
+/* ===== Hero name: letter reveal + shimmer — Playfair ala Izanami ===== */
 #hero-name {
   position: relative;
   display: inline-block;
   white-space: nowrap;
   cursor: default;
+  font-family: var(--font-name);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
   /* Skala nama agar tidak terpotong di layar sempit */
-  font-size: clamp(1.6rem, 8vw, 3rem);
+  font-size: clamp(2.6rem, 7.5vw, 6.25rem);
 }
 
 @media (min-width: 640px) {
-  #hero-name { font-size: 3rem; }
+  #hero-name { font-size: clamp(2.6rem, 7vw, 6.25rem); }
 }
 
 @media (min-width: 768px) {
-  #hero-name { font-size: 3.75rem; }
+  #hero-name { font-size: clamp(2.6rem, 6.5vw, 6.25rem); }
 }
 
 @media (min-width: 1024px) {
-  #hero-name { font-size: 4.5rem; }
+  #hero-name { font-size: clamp(2.6rem, 5.8vw, 5.9rem); }
 }
 
 .hero-name-glow {
@@ -1987,7 +1145,7 @@ html[data-theme="light"] .cinema-loading-text { color: rgba(24, 24, 27, 0.55); }
   filter: drop-shadow(0 0 12px color-mix(in srgb, var(--p-primary) 55%, transparent));
 }
 
-html[data-theme="light"] .hero-name-glow { mix-blend-mode: multiply; }
+
 
 @keyframes heroLetterIn {
   0% {
@@ -2051,19 +1209,14 @@ html[data-theme="light"] .hero-name-glow { mix-blend-mode: multiply; }
 
 .hero-photo-fx {
   position: relative;
-  width: clamp(268px, 78vw, 320px);
-  height: clamp(268px, 78vw, 320px);
+  width: clamp(250px, 62vw, 330px);
+  aspect-ratio: 3 / 4;
+  height: auto;
   will-change: transform;
 }
 
 .hero-photo-glow {
-  position: absolute;
-  inset: -46px;
-  z-index: -1;
-  border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--p-primary) 34%, transparent) 0%, transparent 65%);
-  filter: blur(46px);
-  animation: heroGlowPulse 6s ease-in-out infinite;
+  display: none;
 }
 
 @keyframes heroGlowPulse {
@@ -2127,19 +1280,29 @@ html[data-theme="light"] .hero-name-glow { mix-blend-mode: multiply; }
 .hero-photo-frame {
   position: absolute;
   inset: 0;
-  animation: heroPhotoIn 1.05s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+  transform-origin: left center;
+  animation: heroPhotoIn 1.15s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
   will-change: transform;
 }
 
 @keyframes heroPhotoIn {
-  from { opacity: 0; transform: translateY(46px) scale(0.86); filter: blur(10px); }
-  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(46deg) translateY(34px) scale(0.94);
+    filter: blur(12px) brightness(0.55);
+  }
+  60% { opacity: 1; }
+  to {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) translateY(0) scale(1);
+    filter: blur(0) brightness(1);
+  }
 }
 
 .hero-photo-inner {
   width: 100%;
   height: 100%;
-  border-radius: 28px;
+  border-radius: 0;
   overflow: hidden;
   position: relative;
 }
@@ -2266,7 +1429,7 @@ html[data-theme="light"] .hero-name-glow { mix-blend-mode: multiply; }
   gap: 6px;
   padding: 0.42rem 0.9rem;
   border-radius: 999px;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.6rem;
   letter-spacing: 0.22em;
   color: var(--app-muted);
@@ -2408,11 +1571,7 @@ html[data-theme="light"] .hero-name-glow { mix-blend-mode: multiply; }
   pointer-events: none;
 }
 
-html[data-theme="light"] .video-overlay.navbar-video.nav-settled::after {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.08) 55%, rgba(255, 255, 255, 0.3) 100%),
-    linear-gradient(0deg, color-mix(in srgb, var(--p-primary) 10%, transparent) 0%, transparent 65%);
-}
+
 
 /* ===== Layer FX transisi theme (di atas video, di bawah konten navbar) ===== */
 .navbar-fx {
@@ -2498,14 +1657,9 @@ html[data-theme="light"] .video-overlay.navbar-video.nav-settled::after {
   50% { opacity: 0.75; }
 }
 
-html[data-theme="light"] .navbar-fx.nav-fx-flash::before {
-  background: radial-gradient(95% 60% at 50% 0%, color-mix(in srgb, var(--p-primary) 42%, transparent) 0%, transparent 74%);
-}
 
-html[data-theme="light"] .navbar-fx.nav-fx-settled {
-  height: 4rem;
-  background: transparent;
-}
+
+
 
 /* Text-shadow biar teks & ikon kecil navbar tetap jelas di atas video */
 header#navbar nav a,
@@ -2513,10 +1667,7 @@ header#navbar nav button {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
 }
 
-html[data-theme="light"] header#navbar nav a,
-html[data-theme="light"] header#navbar nav button {
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.65);
-}
+
 
 @keyframes vidSlideUp {
   from { transform: translateY(100%); opacity: 0; }
@@ -2575,54 +1726,6 @@ html.theme-fade .theme-wipe * { transition: none !important; }
   100% { transform: scale(1) rotate(0deg); }
 }
 
-/* ===== Button click FX (ripple + spark burst + jolt) ===== */
-.click-ripple {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 2;
-  transform: translate(-50%, -50%) scale(0);
-  background: radial-gradient(circle, color-mix(in srgb, var(--p-primary) 20%, rgba(255, 255, 255, 0.5)) 0%, color-mix(in srgb, var(--p-secondary) 16%, transparent) 55%, transparent 78%);
-  animation: clickRipple 0.65s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-  will-change: transform, opacity;
-}
-
-.click-ripple.fixed {
-  position: fixed;
-  z-index: 9997;
-}
-
-@keyframes clickRipple {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.9; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-}
-
-.click-burst {
-  position: fixed;
-  z-index: 9997;
-  pointer-events: none;
-}
-
-.click-spark {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 5px;
-  height: 5px;
-  margin: -2.5px 0 0 -2.5px;
-  border-radius: 50%;
-  opacity: 0;
-}
-
-.fx-jolt { animation: btnJolt 0.32s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
-
-@keyframes btnJolt {
-  0% { transform: scale(1); }
-  30% { transform: scale(0.9) translateY(1px); }
-  65% { transform: scale(1.05) translateY(-1px); }
-  100% { transform: scale(1); }
-}
-
 /* ===== Responsive refinements ===== */
 /* Nama hero menyusut di layar sempit agar tidak meluber */
 @media (max-width: 420px) {
@@ -2631,12 +1734,6 @@ html.theme-fade .theme-wipe * { transition: none !important; }
 
 @media (max-width: 360px) {
   #hero-name { font-size: 1.28rem; }
-}
-
-/* Adegan sinematik lebih pendek di mobile (scrollnya tidak kebanyakan) */
-@media (max-width: 640px) {
-  #scroll-scene { height: 400vh; }
-  .chapter { font-size: clamp(1.6rem, 8vw, 2.6rem); }
 }
 
 /* Equalizer music bar ramping di layar kecil */
@@ -2658,3 +1755,1088 @@ img { max-width: 100%; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================
+   AWWWARDS DESIGN LAYER — editorial type, grain, micro-details
+   Semua transform/opacity-only: nol beban JS tambahan.
+   ============================================================ */
+
+/* --- Film grain overlay: tekstur premium, statis (tanpa animasi) --- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  body::after { display: none; }
+}
+
+/* --- Selection & focus ala studio --- */
+::selection {
+  background: rgba(var(--tint-copper), 0.85);
+  color: #fff;
+}
+:focus-visible {
+  outline: 2px solid var(--p-primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* --- Eyebrow: label Cinzel bernomor — penanda section editorial Izanami --- */
+.aw-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-cinzel), Georgia, serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+}
+.aw-eyebrow .aw-num {
+  color: var(--p-secondary);
+  font-weight: 600;
+}
+.aw-eyebrow .aw-kanji {
+  font-family: var(--font-mincho), "Hiragino Mincho ProN", "Yu Mincho", serif;
+  color: var(--p-secondary);
+  letter-spacing: 0.35em;
+  font-size: 0.8rem;
+}
+.aw-eyebrow::after {
+  content: "";
+  width: 2.5rem;
+  height: 1px;
+  background: var(--hairline);
+}
+
+/* --- Display heading skala raksasa (hero / CTA) — Playfair, weight normal ala Izanami --- */
+.aw-display {
+  font-family: var(--font-name);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 7.5vw, 6.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.aw-display em {
+  font-style: italic;
+  color: var(--p-secondary);
+}
+
+/* --- Heading section: Playfair dengan berat ringan --- */
+.section-heading {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0;
+  font-size: clamp(1.9rem, 4.5vw, 3.25rem);
+}
+
+/* --- Marquee XL: skill strip italic serif, filled + outline berselang --- */
+.marquee-wrap .marquee span {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.6vw, 1.9rem);
+  font-weight: 400;
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.marquee-wrap .marquee span:nth-child(even) {
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--app-muted) 70%, transparent);
+}
+
+/* --- Link underline slide (micro-interaksi murah) --- */
+.link-line {
+  position: relative;
+}
+.link-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.link-line:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* --- Tombol solid bone-on-black, sudut tajam --- */
+.btn-solid {
+  background: var(--app-text);
+  color: var(--app-bg);
+}
+
+/* --- Tombol garis ala Izanami: rule 1px atas & bawah + teks roll --- */
+.btn-line {
+  position: relative;
+  display: inline-block;
+  padding: 1.1em 0.4em;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--font-cinzel), Georgia, serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: color 0.45s ease, border-color 0.45s ease;
+}
+.btn-line::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--app-text);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  z-index: 0;
+}
+.btn-line:hover::before { transform: scaleY(1); }
+.btn-line:hover { color: var(--app-bg); }
+.btn-line > * { position: relative; z-index: 1; }
+
+/* --- Chip filter aktif --- */
+.chip-active {
+  background: var(--app-text);
+  color: var(--app-bg) !important;
+}
+
+/* --- Kartu: hairline atas menyala saat hover (bukan glow).
+     SENGAJA tanpa backdrop-filter — blur di banyak kartu membuat
+     scroll jalan berat (tiap frame = recomposite semua blur layer). --- */
+.glass-card {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.project-card::before,
+.blog-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 1;
+  background: linear-gradient(90deg, var(--p-secondary), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.project-card:hover::before,
+.blog-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* ============================================================
+   POLA IZANAMI — vertical label, index rows, fixed rail
+   ============================================================ */
+
+/* --- Label vertikal sticky di sisi kiri section (desktop) --- */
+.vertical-label {
+  writing-mode: vertical-rl;
+  font-family: var(--font-cinzel), Georgia, serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+  display: none;
+}
+@media (min-width: 1024px) {
+  .vertical-label { display: block; }
+}
+
+/* --- Index row project bernomor dengan hairline --- */
+.index-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  width: calc(100% - 10vw);
+  margin-inline: 5vw;
+  padding: clamp(1.4rem, 2.6vw, 2.4rem) 0;
+  border-top: 1px solid var(--hairline);
+  transition: padding-left 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.index-row:last-child { border-bottom: 1px solid var(--hairline); }
+.index-row:hover { padding-left: clamp(0.5rem, 1.5vw, 1.5rem); }
+.index-num {
+  font-family: var(--font-cinzel), Georgia, serif;
+  font-size: clamp(0.75rem, 1.1vw, 0.95rem);
+  letter-spacing: 0.2em;
+  color: var(--p-secondary);
+}
+.index-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3.6vw, 2.9rem);
+  line-height: 1.15;
+  color: var(--app-text);
+  transition: opacity 0.35s ease;
+}
+.index-cat {
+  font-family: var(--font-cinzel), Georgia, serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+  text-align: right;
+}
+/* Thumbnail reveal saat hover — opacity/transform only */
+.index-thumb {
+  pointer-events: none;
+  position: absolute;
+  right: clamp(4rem, 12vw, 14rem);
+  top: 50%;
+  width: clamp(140px, 16vw, 220px);
+  aspect-ratio: 3 / 4;
+  translate: 0 -50%;
+  opacity: 0;
+  scale: 0.92;
+  rotate: 3deg;
+  transition: opacity 0.4s ease, scale 0.4s cubic-bezier(0.22, 0.61, 0.36, 1), rotate 0.4s ease;
+  z-index: 5;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+  outline: 1px solid var(--hairline);
+}
+.index-row:hover .index-thumb { opacity: 1; scale: 1; rotate: 0deg; }
+@media (hover: none) {
+  .index-thumb { display: none; }
+}
+
+/* --- Fixed rail bawah: © | jam | scroll cue (ala aside Izanami) --- */
+.fixed-rail {
+  position: fixed;
+  bottom: 0;
+  inset-inline: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 5vw;
+  pointer-events: none;
+  font-family: var(--font-cinzel), Georgia, serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
+}
+.fixed-rail > * { pointer-events: auto; }
+.fixed-rail .rail-scroll {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.fixed-rail .rail-scroll::after {
+  content: "";
+  width: 1px;
+  height: 2rem;
+  background: linear-gradient(180deg, var(--p-secondary), transparent);
+  animation: railDrop 2.2s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+@keyframes railDrop {
+  0% { transform: scaleY(0); transform-origin: top; }
+  45% { transform: scaleY(1); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+/* --- Hero corner metadata --- */
+.hero-corner {
+  position: absolute;
+  font-family: var(--font-cinzel), Georgia, serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+  z-index: 20;
+}
+
+/* --- Footer wordmark raksasa — Playfair outline --- */
+.footer-wordmark {
+  font-family: var(--font-name);
+  font-weight: 500;
+  font-size: clamp(3rem, 13vw, 11rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--app-muted) 40%, transparent);
+  user-select: none;
+  transition: color 0.6s ease, -webkit-text-stroke-color 0.6s ease;
+}
+.footer-wordmark:hover {
+  color: rgba(255, 255, 255, 0.1);
+  -webkit-text-stroke-color: rgba(255, 255, 255, 0.6);
+}
+
+/* --- Trigger MENU ala Izanami: teks + lingkaran ganda --- */
+.menu-orbits { position: relative; }
+.menu-orbits .mo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+}
+.menu-orbits .mo-inner {
+  inset: 7px;
+  border-color: rgba(255, 255, 255, 0.35);
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+#mobile-menu-btn:hover .mo-inner { transform: scale(1.18); }
+/* Burger lines di dalam orbit */
+.menu-orbits .mb-line {
+  position: absolute;
+  left: 50%;
+  width: 16px;
+  height: 1.5px;
+  background: var(--app-text);
+  translate: -50% -50%;
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.25s ease;
+}
+.menu-orbits .mb-1 { margin-top: -4px; }
+.menu-orbits .mb-2 { margin-top: 0; }
+.menu-orbits .mb-3 { margin-top: 4px; }
+#mobile-menu-btn.open .menu-orbits .mb-1 { transform: translateY(4px) rotate(45deg); }
+#mobile-menu-btn.open .menu-orbits .mb-2 { opacity: 0; }
+#mobile-menu-btn.open .menu-orbits .mb-3 { transform: translateY(-4px) rotate(-45deg); }
+
+/* --- Edge rails vertikal (desktop) --- */
+.edge-rail {
+  position: fixed;
+  top: 50%;
+  z-index: 40;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  pointer-events: none;
+}
+.edge-rail-left { left: 1.1rem; translate: 0 -50%; }
+.edge-rail-right { right: 1.1rem; translate: 0 -50%; }
+.edge-rail .edge-rail-text {
+  writing-mode: vertical-rl;
+  font-family: var(--font-cinzel), Georgia, serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+  pointer-events: auto;
+}
+@media (min-width: 1280px) {
+  .edge-rail { display: flex; }
+}
+/* --- Logo monogram studio: huruf italic Playfair + bingkai hairline + titik copper --- */
+.logo-monogram {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--hairline);
+  transition: border-color 0.4s ease;
+}
+.logo-mono-letter {
+  font-family: var(--font-name);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--app-text);
+  transition: color 0.4s ease, transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.logo-mono-dot {
+  position: absolute;
+  right: -3.5px;
+  bottom: -3.5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--p-secondary);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.group:hover .logo-monogram { border-color: rgba(255, 255, 255, 0.55); }
+.group:hover .logo-mono-letter { color: var(--p-secondary); transform: scale(1.08); }
+.group:hover .logo-mono-dot { transform: scale(1.3); }
+
+/* ============================================================
+   ANIMASI SCROLL ALA IZANAMI — mask reveal, curtain, side rail,
+   clip image reveal, line draw. Semua transform/clip-path only.
+   Kelas .in-view ditambahkan oleh RevealEngine via IntersectionObserver.
+   ============================================================ */
+
+/* --- Mask reveal judul: segmen naik dari wadah terpotong --- */
+.mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.mask-in {
+  display: inline-block;
+  transform: translateY(115%);
+  transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+  will-change: transform;
+}
+.mask-group.in .mask-in { transform: translateY(0); }
+
+/* --- Liquid letters judul section (LiquidTitle) — senada efek hero ---
+   Setiap huruf = unit liquid (translate/rotate/skew/blur mengikuti
+   kursor). inline-block + will-change wajib seperti .hero-letter. --- */
+.sec-letter {
+  display: inline-block;
+  white-space: pre;
+  will-change: transform, filter;
+}
+/* Setelah reveal mask selesai: lepas clip & netralkan transform mask-in
+   supaya offsetLeft huruf kembali relatif ke judul (referensi mesin
+   liquid) dan distorsi tidak terpotong wadah. --- */
+.lt-free .mask { overflow: visible; }
+.lt-free .mask-in { transform: none; }
+
+/* --- Hairline di bawah judul: draw-in setelah teks --- */
+.sh-line {
+  display: block;
+  width: min(220px, 38%);
+  height: 1px;
+  margin: 0.4rem auto 0;
+  background: var(--hairline);
+  transform: scaleX(0);
+  transition: transform 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.45s;
+}
+.sh-line.in { transform: scaleX(1); }
+
+/* --- Rail letter: huruf judul section muncul berjenjang saat berganti --- */
+.rail-letter {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: railLetterIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+@keyframes railLetterIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+/* --- Curtain: tirai warm-black terangkat saat elemen masuk --- */
+[data-curtain] {
+  position: relative;
+  overflow: hidden;
+}
+[data-curtain]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--app-bg);
+  transform: scaleY(1);
+  transform-origin: top;
+  transition: transform 1.1s cubic-bezier(0.77, 0, 0.18, 1) 0.15s;
+  z-index: 5;
+  pointer-events: none;
+}
+[data-curtain].in-view::after { transform: scaleY(0); }
+
+/* --- Image reveal: clip dari bawah + inner scale settle --- */
+[data-img-reveal] {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.15s cubic-bezier(0.77, 0, 0.18, 1);
+}
+[data-img-reveal] img {
+  scale: 1.15;
+  transition: scale 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s;
+}
+[data-img-reveal].in-view { clip-path: inset(0 0 0% 0); }
+[data-img-reveal].in-view img { scale: 1; }
+
+/* --- Line draw: garis hairline memanjang dari kiri --- */
+[data-line] {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+[data-line].in-view { transform: scaleX(1); }
+
+/* Anchor & inertia ditangani LenisProvider — html smooth akan konflik */
+
+@media (prefers-reduced-motion: reduce) {
+  .mask-in { transform: none; }
+  .sh-line, [data-line] { transform: none; }
+  .side-rail::before { transform: none; }
+  [data-curtain]::after { display: none; }
+  [data-img-reveal] { clip-path: none; }
+  [data-img-reveal] img { scale: 1; }
+}
+/* --- Page veil: transisi antar-section ala halaman buku.
+     Section tertutup lapisan warm-black; saat masuk viewport lapisan
+     terangkat ke BAWAH (dari atas ke bawah) dengan garis tembaga sebagai
+     'tepi halaman'. Opacity memudar di akhir agar tidak pernah meluber
+     ke section berikutnya (tanpa perlu overflow:hidden yang mematikan
+     position:sticky pada side-rail). --- */
+.page-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: var(--app-bg);
+  transform: translateY(0);
+  transition: transform 1.15s cubic-bezier(0.77, 0, 0.18, 1), opacity 0.45s ease 0.85s;
+  pointer-events: none;
+}
+.page-veil::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+}
+.page-veil.in-view {
+  transform: translateY(101%);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-veil { display: none; }
+}
+/* --- Glass lens shift: konten hero bergeser berlawanan kursor,
+       digerakkan variabel --lens-dx/--lens-dy dari GlassHero --- */
+#hero [data-lens-shift] {
+  transform: translate3d(calc(var(--lens-dx, 0) * 1px), calc(var(--lens-dy, 0) * 1px), 0);
+  will-change: transform;
+}
+/* --- Preloader: tahan animasi entrance hero sampai curtain terbuka ---
+   .is-loading dipasang Preloader saat counter berjalan; tanpa ini,
+   animasi fade-up & huruf nama selesai terlewat di balik curtain. --- */
+body.is-loading .fade-up,
+body.is-loading .hero-letter {
+  animation-play-state: paused !important;
+}
+/* ============================================================
+   HERO ENTRANCE — koreografi pertama setelah preloader 100%:
+   Background fade-in + zoom-out (scale 1.18 → 1) + clip-path
+   membuka dari TENGAH ke sisi kiri-kanan (mask reveal).
+   Selama body.is-loading, latar disembunyikan; ketika kelas
+   dilepas Preloader, transisi CSS memainkan seluruh reveal.
+   ============================================================ */
+[data-hero-fade] {
+  transition:
+    opacity 1.2s ease 0.1s,
+    transform 1.7s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s,
+    clip-path 1.5s cubic-bezier(0.77, 0, 0.18, 1) 0.1s;
+  will-change: opacity, transform, clip-path;
+}
+body.is-loading [data-hero-fade] {
+  opacity: 0;
+  transform: scale(1.18);
+  clip-path: inset(0 50% 0 50%);
+}
+
+/* --- Logo mark rail: bingkai + diamond, di atas huruf vertikal --- */
+.logo-mark-rail {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--hairline);
+  display: grid;
+  place-items: center;
+  transition: border-color 0.5s ease;
+}
+.logo-mark-rail .lmd {
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  transform: rotate(45deg);
+  transition: transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+a.group:hover .logo-mark-rail { border-color: rgba(255, 255, 255, 0.55); }
+a.group:hover .logo-mark-rail .lmd { transform: rotate(225deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-hero-fade] { transition: none; }
+  body.is-loading [data-hero-fade] { opacity: 1; transform: none; clip-path: none; }
+}
+/* --- Certificate strip: scrollbar disembunyikan, snap halus --- */
+.cert-strip {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.cert-strip::-webkit-scrollbar { display: none; }
+/* ===== Vertical Card Stack / Sticky Scroll Card Slider ===== */
+/* Semua kartu adalah sibling dalam satu container: masing-masing
+   sticky di garis pin yang sama sehingga kartu berikutnya meluncur
+   naik MENUMPUK kartu sebelumnya (bukan menggantikan lalu hilang). */
+.vstack {
+  position: relative;
+}
+.vstack-card {
+  position: sticky;
+  top: 12vh;
+  top: 12svh;
+  margin-bottom: 28vh;
+  margin-bottom: 28svh;
+}
+.vstack-card:last-child {
+  margin-bottom: 0;
+}
+.deck-card {
+  position: relative;
+  height: min(72vh, 700px);
+  height: min(72svh, 700px);
+  border-radius: 0.4rem;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  background-color: #0a0a0c;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 34px 90px -24px rgba(0, 0, 0, 0.85);
+  transform-origin: 50% 20%;
+  will-change: transform, filter;
+}
+/* Tick sudut HUD ala Izanami — EMPAT sudut simetris */
+.deck-card::before,
+.deck-card::after,
+.profile-card::before,
+.profile-card::after,
+.editorial-frame::before,
+.editorial-frame::after,
+.plate-card::before,
+.plate-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  --tick-c: rgba(255, 255, 255, 0.55);
+}
+.deck-card::before,
+.profile-card::before,
+.editorial-frame::before,
+.plate-card::before {
+  background-image:
+    linear-gradient(var(--tick-c), var(--tick-c)),
+    linear-gradient(var(--tick-c), var(--tick-c)),
+    linear-gradient(var(--tick-c), var(--tick-c)),
+    linear-gradient(var(--tick-c), var(--tick-c));
+  background-repeat: no-repeat;
+  background-size: 18px 1px, 1px 18px, 18px 1px, 1px 18px;
+  background-position: left top, left top, right top, right top;
+}
+.deck-card::after,
+.profile-card::after,
+.editorial-frame::after,
+.plate-card::after {
+  background-image:
+    linear-gradient(var(--tick-c), var(--tick-c)),
+    linear-gradient(var(--tick-c), var(--tick-c)),
+    linear-gradient(var(--tick-c), var(--tick-c)),
+    linear-gradient(var(--tick-c), var(--tick-c));
+  background-repeat: no-repeat;
+  background-size: 18px 1px, 1px 18px, 18px 1px, 1px 18px;
+  background-position: left bottom, left bottom, right bottom, right bottom;
+}
+.deck-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(6px);
+  font-family: var(--font-mincho), serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: rgba(226, 232, 240, 0.85);
+}
+.deck-cta {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* --- Kartu profil (About): DIBEDAKAN dari background - potret berbingkai --- */
+.profile-pin {
+  z-index: 5;
+}
+.profile-card {
+  position: relative;
+  padding: 10px;
+  border-radius: 0.55rem;
+  border: 1px solid var(--hairline);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 40%, rgba(34, 211, 238, 0.14) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 44px 100px -32px rgba(0, 0, 0, 0.9);
+  will-change: transform;
+}
+/* Tick sudut HUD — senada deck-card & hero (4 sudut, digambar via rule gabungan di atas) */
+.profile-card > div {
+  border-radius: 0.3rem;
+  background-color: #0a0a0c;
+}
+.profile-plate {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  padding: 12px 18px;
+  border-radius: 0.35rem;
+  background: rgba(7, 9, 13, 0.58);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .vstack-card {
+    top: 9vh;
+    top: 9svh;
+    margin-bottom: 18vh;
+    margin-bottom: 18svh;
+  }
+  .deck-card {
+    height: min(64vh, 560px);
+    height: min(64svh, 560px);
+    border-radius: 0.3rem;
+  }
+}
+
+/* ===== Kartu potret editorial (hero + about) ===== */
+/* Bingkai dobel: hairline frame + outline offset ala mat museum */
+.editorial-frame {
+  position: absolute;
+  inset: 0;
+  outline: 1px solid rgba(255, 255, 255, 0.1);
+  outline-offset: 7px;
+}
+.hero-photo-inner {
+  border: 1px solid var(--hairline);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+/* Tick sudut HUD di frame hero (4 sudut, via rule gabungan di atas) */
+/* Label mono mikro di atas bingkai — dipusatkan simetris */
+.ef-label {
+  position: absolute;
+  top: -26px;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: max-content;
+  font-size: 10px;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+/* Nama vertikal di sisi kartu — signature editorial */
+.vside-label {
+  position: absolute;
+  top: -1px;
+  right: -28px;
+  writing-mode: vertical-rl;
+  font-size: 10px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.vside-label--left {
+  right: auto;
+  left: -28px;
+}
+.vside-kanji {
+  font-family: var(--font-mincho), serif;
+  font-size: 14px;
+  letter-spacing: 0.55em;
+  color: rgba(245, 237, 226, 0.4);
+}
+/* Diamond divider — motif senada logo rail */
+.plate-diamond {
+  display: block;
+  width: 5px;
+  height: 5px;
+  margin: 8px auto 0;
+  background: var(--p-accent, #22d3ee);
+  transform: rotate(45deg);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--p-accent, #22d3ee) 65%, transparent);
+}
+@media (max-width: 640px) {
+  .vside-label { display: none; }
+  .ef-label { top: -22px; }
+}
+
+/* ===== Nuansa B&W / Monokrom ===== */
+/* Film grain analog - lapisan noise halus di atas media foto */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Thumbnail project di index row: B&W -> warna saat hover */
+.index-thumb img {
+  filter: grayscale(1) contrast(1.06);
+  transition: filter 0.55s ease;
+}
+.index-row:hover .index-thumb img {
+  filter: grayscale(0) contrast(1);
+}
+
+/* ===== Transisi antar-section: Book Flip scroll-driven =====
+   Setiap section adalah HALAMAN buku: kemiringannya dihitung dari
+   posisi scroll (fungsi murni rect.top) sehingga bolak-balik —
+   scroll bawah membuka halaman berikutnya, scroll atas menutupnya.
+   Transform dibersihkan tepat saat halaman rata (p >= 1) supaya
+   position:sticky di dalamnya tetap mulus. */
+html.book-ready [data-book] {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.book-ready [data-book] { opacity: 1 !important; }
+}
+
+/* ===== Custom Cursor (studio) ===== */
+html.cursor-on,
+html.cursor-on * { cursor: none !important; }
+html.cursor-on :is(input, textarea, select) { cursor: auto !important; }
+.cursor-dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  mix-blend-mode: difference;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}
+.cursor-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  mix-blend-mode: difference;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    width 0.28s cubic-bezier(0.22, 0.61, 0.36, 1),
+    height 0.28s cubic-bezier(0.22, 0.61, 0.36, 1),
+    background-color 0.28s ease;
+  will-change: transform;
+}
+.cursor-ring.cursor-active {
+  width: 58px;
+  height: 58px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ===== Scroll Ribbon: pembatas buku di tepi kanan ===== */
+.scroll-ribbon {
+  position: fixed;
+  right: 22px;
+  top: 50%;
+  translate: 0 -50%;
+  height: 36vh;
+  width: 8px;
+  z-index: 40;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+.ribbon-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  margin-left: -0.5px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.ribbon-progress {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  height: 0%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.25), #ffffff);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.ribbon-diamond {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  background: #fff;
+  transform: rotate(45deg);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+}
+
+/* ===== Marquee: larut ke hitam di kedua tepi ===== */
+.marquee-wrap {
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+
+/* ===== Kanji ghost watermark per section ===== */
+section[data-kanji] {
+  isolation: isolate;
+}
+section[data-kanji]::before {
+  content: attr(data-kanji);
+  position: absolute;
+  top: -1rem;
+  right: 2vw;
+  z-index: -1;
+  font-family: var(--font-mincho), "Hiragino Mincho ProN", serif;
+  font-size: clamp(7rem, 20vw, 16rem);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.055);
+  pointer-events: none;
+  user-select: none;
+}
+@media (max-width: 640px) {
+  section[data-kanji]::before { font-size: clamp(6rem, 26vw, 9rem); opacity: 0.8; }
+}
+
+/* ===== Plate card: kartu hairline + tick sudut utk halaman dalam ===== */
+.plate-card {
+  position: relative;
+  border: 1px solid var(--hairline);
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 0.35s ease, transform 0.35s ease;
+}
+.plate-card:hover { border-color: rgba(255, 255, 255, 0.32); }
+
+/* ===== Footer editorial: tick sudut ===== */
+.footer-editorial::before,
+.footer-editorial::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  --tick-c: rgba(255, 255, 255, 0.45);
+}
+.footer-editorial::before {
+  top: -1px;
+  left: 14px;
+  border-top: 1px solid var(--tick-c);
+  border-left: 1px solid var(--tick-c);
+}
+.footer-editorial::after {
+  top: -1px;
+  right: 14px;
+  border-top: 1px solid var(--tick-c);
+  border-right: 1px solid var(--tick-c);
+}
+
+/* ===== Layer warna: Aurora ambient =====
+   Blob triad (indigo/cyan/tembaga) raksasa super-lembut di belakang
+   seluruh halaman — base tetap hitam, warna hadir sebagai kabut cahaya
+   yang bergeser sangat pelan. Tidak mengganggu kontras teks. */
+.aurora-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.aurora-layer::before,
+.aurora-layer::after,
+.aurora-blob {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(110px);
+  will-change: transform;
+}
+/* Indigo — kiri atas */
+.aurora-layer::before {
+  width: 52vw;
+  height: 52vw;
+  left: -14vw;
+  top: -18vh;
+  background: rgba(var(--tint-indigo), 0.09);
+  animation: auroraDriftA 44s ease-in-out infinite alternate;
+}
+/* Cyan — kanan bawah */
+.aurora-layer::after {
+  width: 46vw;
+  height: 46vw;
+  right: -12vw;
+  bottom: -16vh;
+  background: rgba(var(--tint-cyan), 0.06);
+  animation: auroraDriftB 52s ease-in-out infinite alternate;
+}
+/* Tembaga — tengah */
+.aurora-blob {
+  width: 38vw;
+  height: 38vw;
+  left: 32vw;
+  top: 34vh;
+  background: rgba(var(--tint-copper), 0.07);
+  animation: auroraDriftC 47s ease-in-out infinite alternate;
+}
+@keyframes auroraDriftA {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(7vw, 6vh, 0) scale(1.15); }
+}
+@keyframes auroraDriftB {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to { transform: translate3d(-6vw, -8vh, 0) scale(0.95); }
+}
+@keyframes auroraDriftC {
+  from { transform: translate3d(-4vw, 3vh, 0) scale(0.95); }
+  to { transform: translate3d(5vw, -4vh, 0) scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-layer::before,
+  .aurora-layer::after,
+  .aurora-blob { animation: none; }
+}
+
+/* ===== Duotone tint di atas foto grayscale =====
+   Lapisan soft-light memberi rona indigo/cyan pada foto B&W;
+   saat hover, lapisan memudar & warna asli foto muncul. */
+.tint-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  opacity: 0.5;
+  background:
+    linear-gradient(135deg, rgba(var(--tint-indigo), 0.75), transparent 55%),
+    linear-gradient(315deg, rgba(var(--tint-copper), 0.5), transparent 62%);
+  transition: opacity 0.7s ease;
+}
+.group:hover .tint-layer { opacity: 0.12; }

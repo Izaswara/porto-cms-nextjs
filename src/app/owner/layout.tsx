@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import ClickFx from '@/components/public/ClickFx';
 import './owner.css';
 
 const NAV = [
@@ -18,6 +17,7 @@ const NAV = [
   { href: '/owner/resources/education', label: 'Education', icon: '🎓' },
   { href: '/owner/resources/certificates', label: 'Certificates', icon: '🏅' },
   { href: '/owner/resources/galleries', label: 'Galleries', icon: '🖼️' },
+  { href: '/owner/resources/showcase', label: 'Showcase', icon: '📸' },
   { href: '/owner/resources/social', label: 'Social Media', icon: '🔗' },
   { href: '/owner/resources/contacts', label: 'Pesan Masuk', icon: '✉️' },
   { href: '/owner/resources/menu', label: 'Menu', icon: '🧭' },
@@ -53,12 +53,11 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex min-h-screen bg-slate-950 font-[Inter]">
-      <ClickFx />
       <aside className={`fixed inset-y-0 left-0 z-40 w-60 bg-slate-900/80 border-r border-white/10 overflow-y-auto transition-transform lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="px-4 py-4 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">🚀</span>
-            <span className="font-[Space_Grotesk] font-bold text-white">Porto CMS</span>
+            <span className="font-display font-bold text-white">Porto CMS</span>
           </div>
           <button onClick={() => setOpen(false)} className="lg:hidden text-slate-400 hover:text-white cursor-pointer">×</button>
         </div>
