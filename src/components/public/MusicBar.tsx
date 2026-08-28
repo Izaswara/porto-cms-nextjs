@@ -5,24 +5,27 @@ import { toggleBgm, onBgmChange } from '@/lib/bgm-store';
 import Hud from '@/components/public/Hud';
 
 const BAR_COUNT = 32;
-const IDLE_MS = 2800; // tanpa aktivitas selama ini → bar muncul
+const IDLE_MS = 4200; // tanpa aktivitas selama ini → bar muncul
+const NEAR_BAR_PX = 240; // kursor sedekat ini dari bawah → anggap mau klik bar
 
 /**
  * MusicBar — pemutar BGM gaya desain baru.
  *
  * Perilaku:
  *  - Posisi tengah-bawah, di atas FixedRail.
- *  - HANYA MUNCUL SAAT IDLE: aktivitas apa pun (gerak kursor, scroll,
- *    klik, ketikan) menyembunyikannya; diam ±2.8 detik memunculkannya
- *    kembali dengan fade halus.
- *  - Kursor di ATAS bar dihitung "idle" — supaya bar tidak kabur
- *    tepat saat mau diklik.
+ *  - MUNCUL saat idle/mendekati bar; disembunyikan saat aktivitas nyata:
+ *    scroll, wheel, ketikan, maupun tekan di luar bar.
+ *  - Aktivitas yang berasal DARI DALAM bar diabaikan — jadi tombolnya
+ *    selalu bisa ditekan tanpa bar "kabur" justru saat mau diklik.
+ *  - Kursor yang mendekat ke zona bawah juga membuat bar muncul lebih
+ *    dulu, supaya tidak kalah cepat dengan transisi fade-out.
  *  - Tombol tutup menyembunyikan permanen (sampai reload).
  */
 export default function MusicBar() {
   const [playing, setPlaying] = useState(false);
   const [hidden, setHidden] = useState(false); // ditutup manual
   const [idle, setIdle] = useState(false); // true = bar terlihat
+  const barRef = useRef<HTMLDivElement>(null);
   const hoverRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const lastArmRef = useRef(0);
@@ -46,17 +49,49 @@ export default function MusicBar() {
       }, IDLE_MS);
     };
 
+    const showNow = () => {
+      setIdle(true);
+      clearTimeout(timerRef.current);
+    };
+
     const markActive = () => {
       setIdle(false);
       raf = requestAnimationFrame(arm);
     };
 
+    const overBar = (e: Event) => barRef.current?.contains(e.target as Node) ?? false;
+
+    // Gerakan kursor: di dalam bar / mendekati zona bawah → TAMPILKAN.
+    // Aktivitas lain → sembunyikan (bar tidak kabur saat kursor menuju ke sana).
+    const onMove = (e: Event) => {
+      const pe = e as PointerEvent;
+      if (pe.pointerType !== 'mouse') return;
+      if (overBar(e) || pe.clientY > window.innerHeight - NEAR_BAR_PX) showNow();
+      else markActive();
+    };
+
+    // Tekan: klik di dalam bar jangan dianggap aktivitas (bar tetap hidup).
+    const onDown = (e: Event) => {
+      if (overBar(e)) {
+        showNow();
+        return;
+      }
+      markActive();
+    };
+
+    // Scroll/wheel/sentuh di dalam bar jarang terjadi — biarkan tidak menyangkut.
+    const onHard = (e: Event) => {
+      if (overBar(e)) return;
+      markActive();
+    };
+
     const events: Array<[string, EventListener]> = [
-      ['pointermove', markActive],
-      ['pointerdown', markActive],
-      ['wheel', markActive],
-      ['scroll', markActive],
+      ['pointermove', onMove],
+      ['pointerdown', onDown],
+      ['wheel', onHard],
+      ['scroll', onHard],
       ['keydown', markActive],
+      ['touchstart', onHard],
     ];
     events.forEach(([n, h]) => window.addEventListener(n, h, { passive: true }));
 
@@ -86,16 +121,18 @@ export default function MusicBar() {
 
   return (
     <div
+      id="music-bar"
+      ref={barRef}
       className={`fixed bottom-12 left-1/2 z-[55] -translate-x-1/2 transition-all duration-700 ease-out ${
         idle ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0 pointer-events-none'
       }`}
-      onMouseEnter={() => {
+      onPointerEnter={() => {
         // Kursor di atas bar = dianggap idle, bar tetap terlihat
         hoverRef.current = true;
         setIdle(true);
         clearTimeout(timerRef.current);
       }}
-      onMouseLeave={() => {
+      onPointerLeave={() => {
         hoverRef.current = false;
       }}
     >

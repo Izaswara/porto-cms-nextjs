@@ -17,6 +17,7 @@ import MusicBar from '@/components/public/MusicBar';
 import FixedRail from '@/components/public/FixedRail';
 import EdgeRails from '@/components/public/EdgeRails';
 import CustomCursor from '@/components/public/CustomCursor';
+import ClickSweep from '@/components/public/ClickSweep';
 import ScrollRibbon from '@/components/public/ScrollRibbon';
 import JsonLd from '@/components/public/JsonLd';
 import type { Locale } from '@/lib/types';
@@ -114,6 +115,7 @@ export default async function PublicLayout({ children }: { children: React.React
       <LocaleSync locale={locale as Locale} />
       <LenisProvider />
       <RevealEngine />
+      <ClickSweep />
       <CustomCursor />
       <ScrollRibbon />
       <Hud />
@@ -124,12 +126,14 @@ export default async function PublicLayout({ children }: { children: React.React
         translations={translations}
         cvUrl={settings['cv_url'] || null}
       />
-      <main className="relative z-10">{children}</main>
-      <Footer
-        siteName={siteName}
-        siteFooter={settings['site_footer']}
-        socials={socials}
-      />
+      <div className="site-content">
+        <main className="relative z-10">{children}</main>
+        <Footer
+          siteName={siteName}
+          siteFooter={settings['site_footer']}
+          socials={socials}
+        />
+      </div>
       <MusicBar />
       <EdgeRails socials={socials} />
       <FixedRail siteName={siteName} />

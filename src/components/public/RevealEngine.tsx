@@ -22,7 +22,7 @@ export default function RevealEngine() {
 
     // ── Registry reveal terpusat ──
     type Kind = 'reveal' | 'fx' | 'mask' | 'stagger' | 'counter';
-    const FX_SELECTOR = '.page-veil, [data-curtain], [data-img-reveal], [data-line]';
+    const FX_SELECTOR = '.page-veil, [data-img-reveal]';
     let pending: { el: HTMLElement; kind: Kind }[] = [];
     const seen = new WeakSet<HTMLElement>();
 

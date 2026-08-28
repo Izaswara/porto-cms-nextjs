@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { LOCALE_SHORT, type Locale } from '@/lib/types';
 import { t } from '@/lib/public-data';
-import VideoOverlay from './VideoOverlay';
 import LocalTime from './LocalTime';
 
 interface NavbarProps {
@@ -32,9 +31,14 @@ export default function Navbar({ menus, locale, translations, cvUrl }: NavbarPro
   const navigatingRef = useRef(false);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen || (closing && !navigatingRef.current) ? 'hidden' : '';
+    const isOpen = menuOpen || (closing && !navigatingRef.current);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    // Konten halaman "mundur" (scale + fade) saat menu terbuka — ala transisi Izanami
+    const content = document.querySelector<HTMLElement>('.site-content');
+    content?.classList.toggle('menu-recede', isOpen);
     return () => {
       document.body.style.overflow = '';
+      content?.classList.remove('menu-recede');
     };
   }, [menuOpen, closing]);
 
@@ -60,23 +64,8 @@ export default function Navbar({ menus, locale, translations, cvUrl }: NavbarPro
   const closeMenu = (fast = false) => {
     if (!menuOpenRef.current || closingRef.current) return;
     closingRef.current = true;
-    const video = document.getElementById('menu-video') as HTMLVideoElement | null;
-    if (fast || !video || video.error || video.readyState < 1) {
-      setClosing(true);
-      failSafeRef.current = window.setTimeout(finalizeClose, 430);
-      return;
-    }
-    // Video punya fade-out baked di akhir: seek mendekati akhir lalu biarkan
-    // event `ended` yang menutup — transisi terasa sinematik.
-    video.loop = false;
-    const d = video.duration || 4;
-    video.currentTime = Math.max(0, d - 0.9);
-    video.play().catch(() => {});
-    failSafeRef.current = window.setTimeout(finalizeClose, 2200);
-  };
-
-  const onMenuVideoEnded = () => {
-    if (closingRef.current) finalizeClose();
+    setClosing(true);
+    failSafeRef.current = window.setTimeout(finalizeClose, fast ? 120 : 430);
   };
 
   useEffect(() => () => clearTimeout(failSafeRef.current), []);
@@ -93,8 +82,10 @@ export default function Navbar({ menus, locale, translations, cvUrl }: NavbarPro
 
   return (
     <>
-      {/* Elemen melayang kanan-atas — tanpa bar, tanpa latar */}
-      <header className="fixed top-0 inset-x-0 z-50 pointer-events-none">
+      {/* Elemen melayang kanan-atas — tanpa bar, tanpa latar.
+          Saat menu terbuka header dinaikkan di atas overlay (z-[70] > 60)
+          supaya tombol MENU/CLOSE & switcher bahasa tetap bisa diakses plain. */}
+      <header className={`fixed top-0 inset-x-0 pointer-events-none ${menuOpen ? 'z-[70]' : 'z-50'}`}>
         <div className="flex items-center justify-end gap-10 sm:gap-16 px-6 sm:px-12 pt-8">
           {/* Bahasa: ID EN — aktif ditandai titik di atas (ala • EN JA) */}
           <div className="pointer-events-auto flex items-start gap-5">
@@ -122,21 +113,26 @@ export default function Navbar({ menus, locale, translations, cvUrl }: NavbarPro
             ))}
           </div>
 
-          {/* MENU / CLOSE — self-start: anchor top 2rem, persis sama dengan
-              tombol CLOSE di overlay (#neural-close) supaya tombol terasa
-              tidak pernah pindah tempat saat dibuka/ditutup */}
+          {/* MENU / CLOSE — satu-satunya toggle (kunci: tidak pernah pindah
+              tempat & ukurannya tetap sama saat dibuka/ditutup). Versi awal
+              punya tombol Close KEDUA di overlay (#neural-close) yang tumpang
+              tindih di posisi yang sama — bikin teks tampak "bayang-bayang"
+              & ukurannya berubah (13px vs 11px). Sekarang overlay tidak punya
+              tombol sendiri; header yang dinahkan di atasnya saat terbuka. */}
           <button
             onClick={toggleMenu}
             aria-expanded={menuOpen}
             aria-controls="neural-menu"
-            className="pointer-events-auto self-start font-mono-accent text-[13px] uppercase tracking-[0.3em] text-white/90 hover:text-white hover:opacity-60 transition-all"
+            className={`pointer-events-auto self-start font-mono-accent text-[13px] uppercase tracking-[0.3em] transition-colors duration-300 ${
+              menuOpen ? 'text-white' : 'text-white/90 hover:text-white hover:opacity-60'
+            }`}
           >
             {menuOpen ? 'Close' : 'Menu'}
           </button>
         </div>
       </header>
 
-      {/* Overlay navigasi fullscreen */}
+      {/* Overlay navigasi fullscreen — gaya menu Izanami resmi */}
       <div
         id="neural-menu"
         className={menuOpen ? 'open' : closing ? 'closing' : ''}
@@ -147,55 +143,34 @@ export default function Navbar({ menus, locale, translations, cvUrl }: NavbarPro
           closeMenu();
         }}
       >
-        {menuOpen && (
-          <VideoOverlay
-            id="menu-video"
-            src="/videos/menu.mp4"
-            variant="slide"
-            loop
-            preload="auto"
-            onEnded={onMenuVideoEnded}
-          />
-        )}
-        <button id="neural-close" className="neural-close font-mono-accent text-[13px] uppercase tracking-[0.3em]" onClick={() => closeMenu()} aria-label="Tutup menu">
-          Close
-        </button>
-        <div className="neural-grid" />
-        <div className="neural-scanline" />
-        <div className="neural-emblem" aria-hidden="true">
-          <i className="ne-em ne-1" /><i className="ne-em ne-2" /><i className="ne-em ne-3" />
+        <div className="menu-body">
+          <nav className="menu-nav">
+            {menus.map((menu, i) => {
+              const name = t(translations, `menu.${menu.slug}`, menu.name);
+              return (
+                <a
+                  key={menu.slug}
+                  href={menu.url}
+                  className="menu-link"
+                  onClick={() => {
+                    navigatingRef.current = true;
+                    closeMenu(true);
+                  }}
+                  style={{ '--i': i, '--count': menus.length } as React.CSSProperties}
+                >
+                  <span className="menu-link-inner">
+                    <span className="menu-name" data-text={name}>{name}</span>
+                    <span className="menu-line" aria-hidden="true" />
+                  </span>
+                </a>
+              );
+            })}
+          </nav>
         </div>
-        <div className="neural-head" aria-hidden="true">
-          <span className="neural-bracket nch" style={{ animationDelay: '80ms' }}>[</span>
-          {'NAVIGATION'.split('').map((ch, i) => (
-            <span key={i} className="nch" style={{ animationDelay: `${160 + i * 40}ms` }}>{ch}</span>
-          ))}
-          <span className="neural-bracket nch" style={{ animationDelay: '580ms' }}>]</span>
-          <span className="neural-cursor nch" style={{ animationDelay: '660ms' }}>_</span>
-        </div>
-        <nav className="neural-nav">
-          {menus.map((menu, i) => (
-            <a
-              key={menu.slug}
-              href={menu.url}
-              className="neural-link"
-              onClick={() => {
-                navigatingRef.current = true;
-                closeMenu(true);
-              }}
-              style={{ '--i': i, '--count': menus.length } as React.CSSProperties}
-            >
-              <span className="neural-idx">{String(i + 1).padStart(2, '0')}</span>
-              <span className="neural-name">{t(translations, `menu.${menu.slug}`, menu.name)}</span>
-              <span className="neural-arrow">→</span>
-              <span className="neural-scan" />
-            </a>
-          ))}
-        </nav>
-        <div className="neural-foot">
-          <span className="neural-status" style={{ color: 'var(--p-secondary)' }}>●</span>
+        <div className="menu-foot">
+          <span className="menu-status" aria-hidden="true" />
           {cvUrl && (
-            <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+            <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="menu-foot-link">
               CV ↗
             </a>
           )}

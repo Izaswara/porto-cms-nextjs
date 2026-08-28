@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from 'react';
 
-/** Jam lokal live — detail kecil khas situs studio/awwwards. */
+/**
+ * Jam lokal live — detail kecil khas situs studio/awwwards.
+ * Gaya didorong CSS variable (--lt-*) dengan default yang aman, sehingga
+ * tiap konteks (footer / fixed-rail / menu) bisa menyesuaikan ukuran,
+ * spacing & warna tanpa menumpuk utility yang bentrok.
+ */
 export default function LocalTime({ label = 'JAKARTA' }: { label?: string }) {
   const [time, setTime] = useState('');
 
@@ -21,8 +26,8 @@ export default function LocalTime({ label = 'JAKARTA' }: { label?: string }) {
   }, []);
 
   return (
-    <span className="hidden lg:inline-flex items-center gap-2 font-mono-accent text-[11px] tracking-[0.18em] text-slate-500" suppressHydrationWarning>
-      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" aria-hidden="true" />
+    <span className="local-time" suppressHydrationWarning>
+      <span className="local-time-dot" aria-hidden="true" />
       {label} {time} WIB
     </span>
   );
