@@ -52,6 +52,7 @@ export default function Hud() {
   const scrollYRef = useRef<HTMLSpanElement>(null);
   const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
   const cancelledRef = useRef(false);
+  const fallbackTimerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     cancelledRef.current = false;
@@ -71,7 +72,16 @@ export default function Hud() {
       );
     };
     tick();
-    const interval = setInterval(tick, 1000);
+    let interval = window.setInterval(tick, 1000);
+    // Jeda interval 1s saat tab tidak terlihat — hemat main-thread.
+    const onVis = () => {
+      clearInterval(interval);
+      if (!document.hidden) {
+        tick();
+        interval = window.setInterval(tick, 1000);
+      }
+    };
+    document.addEventListener('visibilitychange', onVis);
 
     const onScroll = () => {
       if (scrollYRef.current) scrollYRef.current.textContent = String(Math.round(window.scrollY)).padStart(4, '0');
@@ -114,27 +124,42 @@ export default function Hud() {
         loadWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon);
         return;
       }
-      const t = setTimeout(() => {
+      const t = window.setTimeout(() => {
         if (!coordsRef.current) loadWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon);
       }, 6000);
+      fallbackTimerRef.current = t;
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           clearTimeout(t);
+          fallbackTimerRef.current = undefined;
           coordsRef.current = { lat: pos.coords.latitude, lon: pos.coords.longitude };
           loadWeather(pos.coords.latitude, pos.coords.longitude);
         },
         () => {
           clearTimeout(t);
+          fallbackTimerRef.current = undefined;
           loadWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon);
         },
         { enableHighAccuracy: false, maximumAge: 15 * 60 * 1000, timeout: 6000 }
       );
     };
 
-    locate();
-    const refresh = setInterval(() => {
+    // Weather adalah info dekoratif (aria-hidden, tersembunyi di <md).
+    // Low-end / Save-Data: lewati fetch geolokasi & cuaca — hemat jaringan.
+    const doc = document.documentElement;
+    const lowMode = doc.getAttribute('data-performance') === 'low';
+    const saveData = doc.getAttribute('data-save-data') === '1';
+    const refreshMins = () => {
       const c = coordsRef.current ?? DEFAULT_LOC;
       loadWeather(c.lat, c.lon);
+    };
+    if (!lowMode && !saveData) {
+      locate();
+      refreshMins();
+    }
+    const refresh = window.setInterval(() => {
+      if (lowMode || saveData) return;
+      refreshMins();
     }, 10 * 60 * 1000);
 
     return () => {
@@ -142,6 +167,11 @@ export default function Hud() {
       clearInterval(interval);
       clearInterval(refresh);
       window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('visibilitychange', onVis);
+      if (fallbackTimerRef.current) {
+        clearTimeout(fallbackTimerRef.current);
+        fallbackTimerRef.current = undefined;
+      }
     };
   }, []);
 

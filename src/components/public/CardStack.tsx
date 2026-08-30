@@ -38,6 +38,9 @@ export function StackCards({ items }: { items: StackCardItem[] }) {
 
     let ticking = false;
     let raf = 0;
+    // Low-end: hindari filter brightness/saturate per-frame (paint mahal).
+    // Sticky stacking (CSS murni) tetap bekerja; transform sederhana saja.
+    const low = document.documentElement.getAttribute('data-performance') === 'low';
     const apply = () => {
       ticking = false;
       const vh = window.innerHeight;
@@ -59,7 +62,11 @@ export function StackCards({ items }: { items: StackCardItem[] }) {
         const ty = (1 - inP) * 40 - eased * 28;
         const rot = (i % 2 === 0 ? -1 : 1) * 1.4 * eased;
         el.style.transform = `translate3d(0, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-        el.style.filter = `brightness(${(1 - 0.42 * eased).toFixed(3)}) saturate(${(1 - 0.22 * eased).toFixed(3)})`;
+        if (low) {
+          el.style.filter = '';
+        } else {
+          el.style.filter = `brightness(${(1 - 0.42 * eased).toFixed(3)}) saturate(${(1 - 0.22 * eased).toFixed(3)})`;
+        }
       }
     };
     const onScroll = () => {
@@ -150,6 +157,8 @@ export function ProfilePin({ src, alt, name, role }: {
     const wrap = wrapRef.current;
     if (!wrap) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Low-end: biarkan kartu ter-pin polos tanpa parallax scroll (hemat GPU).
+    if (document.documentElement.getAttribute('data-performance') === 'low') return;
     const card = wrap.querySelector<HTMLElement>('[data-profile-card]');
     if (!card) return;
 

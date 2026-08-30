@@ -18,6 +18,9 @@ import Lenis from 'lenis';
 export default function LenisProvider() {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Low-end / jaringan lambat: gunakan scroll native (lebih hemat CPU-GPU),
+    // fitur inertia tetap tersedia di medium ke atas.
+    if (document.documentElement.getAttribute('data-performance') === 'low') return;
 
     const lenis = new Lenis({
       lerp: 0.11,

@@ -17,6 +17,11 @@ import { useEffect } from 'react';
 export default function RevealEngine() {
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Mode performa dipakai untuk menurunkan cost scroll-driven di perangkat
+    // lemah: parallax & book-flip ditiadakan di low-end, book-flip disederhanakan
+    // (tanpa filter brightness) di medium. Reveal/intro tetap jalan agar konten
+    // tidak pernah hilang.
+    const perf = document.documentElement.getAttribute('data-performance') ?? 'medium';
 
     if (reduced) return;
 
@@ -145,7 +150,8 @@ export default function RevealEngine() {
     }
 
     // Smooth scroll parallax for [data-parallax] — offset di-cache, tanpa getBoundingClientRect per frame
-    const parallaxEls = Array.from(document.querySelectorAll<HTMLElement>('[data-parallax]'));
+    // Low-end: paralaks scroll diabaikan (cukup boros untuk GPU lemah).
+    const parallaxEls = perf === 'low' ? [] : Array.from(document.querySelectorAll<HTMLElement>('[data-parallax]'));
     const parData = parallaxEls.map((el) => {
       const r = el.getBoundingClientRect();
       return { el, cy: r.top + window.scrollY + r.height / 2, speed: Number(el.getAttribute('data-parallax')) || 0.1 };
@@ -209,7 +215,7 @@ export default function RevealEngine() {
     let clearBookStyle: (el: HTMLElement) => void = () => {};
     let remeasure: () => void = () => {};
     let bkTops: number[] = [];
-    if (bookEls.length > 0) {
+    if (bookEls.length > 0 && perf !== 'low') {
       document.documentElement.classList.add('book-ready');
       // Halaman buku terbuka penuh. PENTING: opacity WAJIB di-set '1'
       // inline — CSS dasar `html.book-ready [data-book] { opacity: 0 }`
@@ -262,11 +268,13 @@ export default function RevealEngine() {
             continue;
           }
           const e = p * p * (3 - 2 * p); // smoothstep
-          el.style.willChange = 'transform, opacity, filter';
+          el.style.willChange = 'transform, opacity';
           el.style.transformOrigin = '50% 0%';
           el.style.transform = `perspective(1600px) rotateX(${((1 - e) * 34).toFixed(2)}deg) translateY(${((1 - e) * 9).toFixed(2)}vh) scale(${(0.975 + e * 0.025).toFixed(4)})`;
           el.style.opacity = (0.3 + e * 0.7).toFixed(3);
-          el.style.filter = `brightness(${(0.55 + e * 0.45).toFixed(3)})`;
+          // Filter brightness per-frame itu mahal; hanya untuk high-end.
+          if (perf !== 'medium') el.style.filter = `brightness(${(0.55 + e * 0.45).toFixed(3)})`;
+          else el.style.filter = '';
         }
       };
       onBkScroll = () => {

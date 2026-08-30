@@ -205,6 +205,16 @@ export function useLiquidGroup(
 ) {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Nonaktif di perangkat sentuh & mode performa rendah (comment aslinya
+    // mengklaim ini, tapi tidak pernah diimplementasikan — sekarang nyata).
+    // Touch/mobile coarse tidak punya hover stabil: menggerakkan teks saat
+    // scroll/drag cukup boros. Fallback aman jika atribut belum sempat disetel.
+    const doc = document.documentElement;
+    const touch =
+      window.matchMedia('(any-pointer: coarse)').matches &&
+      !window.matchMedia('(pointer: fine)').matches;
+    const lowMode = doc.getAttribute('data-performance') === 'low';
+    if (touch || lowMode) return;
     const container = containerRef.current;
     if (!container) return;
 

@@ -1835,3 +1835,99 @@ section[data-kanji="迷"]:hover .nf-num--zero {
 @media (prefers-reduced-motion: reduce) {
   .clk-sweep { display: none; }
 }
+
+/* ============================================================
+   ADAPTIVE LAYER — performance mode, capability, touch, network
+   ============================================================
+
+   Atribut data-* (data-performance / data-save-data / data-touch /
+   data-network) disetel oleh AdaptiveProvider (src/lib/adaptive.ts).
+   CSS di bawah menurunkan efek dekoratif yang paling mahal berdasarkan
+   mode perangkat — tanpa mengubah konten / fungsi / layout inti.
+   ============================================================ */
+
+/* ── LOW: matikan efek blur / grain / beam / shimmer yang mahal ── */
+[data-performance='low'] .aurora-layer { display: none; }
+[data-performance='low'] .orb { animation: none; filter: none; opacity: 0.05; }
+[data-performance='low'] body::after { display: none; } /* grain */
+[data-performance='low'] .glass-card::before { display: none; } /* conic beam */
+[data-performance='low'] .glass-card::after { display: none; } /* hover radial */
+[data-performance='low'] .text-gradient { animation: none; background-size: 100% 100%; }
+[data-performance='low'] .shine::after { animation: none; display: none; }
+[data-performance='low'] .marquee { animation: none; }
+[data-performance='low'] .music-bar-float { animation: none; }
+[data-performance='low'] .hero-letter {
+  animation: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--p-secondary);
+  background: none;
+}
+[data-performance='low'] #hero-name { color: var(--p-secondary); }
+[data-performance='low'] .deck-chip,
+[data-performance='low'] .profile-plate { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(7, 9, 13, 0.85); }
+
+/* ── LOW + Save Data / jaringan sangat lambat: kurangi animasi loop ── */
+[data-performance='low'] .hud-inline .hud-dot,
+[data-performance='low'] .local-time-dot,
+[data-performance='low'] .menu-status { animation: none; }
+[data-performance='low'] .music-eq { animation: none; }
+[data-performance='low'] .rail-scroll::after { animation: none; }
+[data-performance='low'] #neural-menu .menu-link,
+[data-performance='low'] #neural-menu .menu-link * { transition: none; }
+
+/* ── MEDIUM: pertahankan sebagian besar, tapi halau yang berat ── */
+[data-performance='medium'] .deck-chip,
+[data-performance='medium'] .profile-plate { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+[data-performance='medium'] .aurora-layer { opacity: 0.6; }
+
+/* ── HIGH: izinkan full visual (default paling expressif) ── */
+[data-performance='high'] .deck-chip { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+/* ── Touch: hapus efek yang hanya berarti dengan hover penunjuk ──
+   (taruhan aman: touch & perangkat coarse tidak punya hover stabil) ── */
+@media (hover: none), (pointer: coarse) {
+  .glass-card:hover::after { opacity: 0; }
+  .glass-card:hover::before { opacity: 0; }
+  .cardBeamSpin { animation: none; }
+  .hero-corner-meta { display: none; }
+}
+
+/* ── prefers-reduced-motion: harden semua efek loop yang belum digate ── */
+@media (prefers-reduced-motion: reduce) {
+  .music-bar-float { animation: none; }
+  .rail-letter { animation: none; opacity: 1; transform: none; }
+  .local-time-dot { animation: none; }
+  .hud-inline .hud-dot { animation: none; }
+  .hud-inline .hud-cursor { animation: none; }
+  .marquee { animation: none; }
+}
+[data-reduced-motion='1'] .music-eq { animation: none; }
+
+/* ── @supports fallback: backdrop-filter tidak universal (Safari lama) ── */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .deck-chip, .profile-plate, #music-bar > div {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .profile-plate { background: rgba(7, 9, 13, 0.92); }
+}
+
+/* ── Ultra-wide: content jangan melebar tak terkendali ── */
+@media (min-width: 2200px) {
+  .max-w-6xl { max-width: 1400px; }
+  .max-w-4xl { max-width: 1100px; }
+}
+
+/* ── CLS safeguards: beri ruang/aspect-ratio agar tidak melompat ── */
+img, video { max-width: 100%; height: auto; }
+img[width], img[height] { height: auto; }
+.aspect-\[3\/4\] { aspect-ratio: 3 / 4; }
+.aspect-\[4\/5\] { aspect-ratio: 4 / 5; }
+
+/* ── Keyboard: pastikan interactive focus selalu terlihat & target nyaman ── */
+@media (max-width: 768px) {
+  a, button, input, textarea, select {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}

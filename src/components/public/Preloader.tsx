@@ -26,10 +26,27 @@ export default function Preloader() {
   const [gone, setGone] = useState(false);
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Reduced-motion → dilewati. Low-end / Save-Data → dilewati juga agar
+    // konten di atas lipatan (LCP) tampil secepat mungkin tanpa curtain 2s.
+    const skip =
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      document.documentElement.getAttribute('data-performance') === 'low' ||
+      document.documentElement.getAttribute('data-save-data') === '1';
+    if (skip) {
       setGone(true);
       return;
     }
+
+    // Lepas scroll LOCK tukar-semua-jalur, idempoten: apapun penyebabnya
+    // (selesai normal / unmount / timer diinterupsi) body curl dibuka
+    // persis sekali sehingga hero selalu bisa discroll.
+    let released = false;
+    const release = () => {
+      if (released) return;
+      released = true;
+      document.body.classList.remove('is-loading');
+      document.body.style.overflow = '';
+    };
 
     document.body.classList.add('is-loading');
     document.body.style.overflow = 'hidden';
@@ -37,6 +54,8 @@ export default function Preloader() {
     const DURATION = 2000;
     const start = performance.now();
     let raf = 0;
+    let holdTimer = 0;
+    let fadeTimer = 0;
 
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / DURATION);
@@ -46,12 +65,13 @@ export default function Preloader() {
         raf = requestAnimationFrame(tick);
       } else {
         setPct(100);
-        // Tahan sejenak di 100, lalu buka curtain
-        setTimeout(() => {
+        // Tahan sejenak di 100, lalu buka curtain.
+        holdTimer = window.setTimeout(() => {
           setFading(true);
-          document.body.classList.remove('is-loading');
-          document.body.style.overflow = '';
-          setTimeout(() => setGone(true), 800);
+          // Curtain memudar; scroll BISA mulai dibuka saat fade berjalan —
+          // tidak perlu menunggu fade selesai untuk hero yang bisa discroll.
+          release();
+          fadeTimer = window.setTimeout(() => setGone(true), 800);
         }, 380);
       }
     };
@@ -59,8 +79,9 @@ export default function Preloader() {
 
     return () => {
       cancelAnimationFrame(raf);
-      document.body.classList.remove('is-loading');
-      document.body.style.overflow = '';
+      clearTimeout(holdTimer);
+      clearTimeout(fadeTimer);
+      release();
     };
   }, []);
 

@@ -132,10 +132,13 @@ export default function GlassLens({
     const canvas = canvasRef.current;
     if (!host || !canvas) return;
 
+    const doc = document.documentElement;
     if (
       window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
       !window.matchMedia('(pointer: fine)').matches ||
-      liveLenses >= MAX_LENSES
+      liveLenses >= MAX_LENSES ||
+      doc.getAttribute('data-performance') === 'low' ||
+      doc.getAttribute('data-save-data') === '1'
     ) {
       setFallback(true);
       return;
